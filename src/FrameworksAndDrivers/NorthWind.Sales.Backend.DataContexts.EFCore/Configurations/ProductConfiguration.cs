@@ -14,11 +14,11 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.Property(p => p.UnitPrice).HasPrecision(18, 2);
 
         builder.HasData(
-            new Product { Id = 1, Name = "Chai", UnitPrice = 18.00m, UnitsInStock = 39 },
-            new Product { Id = 2, Name = "Chang", UnitPrice = 19.00m, UnitsInStock = 17 },
-            new Product { Id = 3, Name = "Aniseed Syrup", UnitPrice = 10.00m, UnitsInStock = 13 },
-            new Product { Id = 4, Name = "Chef Anton's Cajun Seasoning", UnitPrice = 22.00m, UnitsInStock = 53 },
-            new Product { Id = 5, Name = "Chef Anton's Gumbo Mix", UnitPrice = 21.35m, UnitsInStock = 0 }
+            new Product { Id = 1, Name = "Chai", UnitPrice = 35.00m, UnitsInStock = 20 },
+            new Product { Id = 2, Name = "Chang", UnitPrice = 55.00m, UnitsInStock = 0 },
+            new Product { Id = 3, Name = "Aniseed Syrup", UnitPrice = 65.00m, UnitsInStock = 20 },
+            new Product { Id = 4, Name = "Chef Anton's Cajun Seasoning", UnitPrice = 75.00m, UnitsInStock = 40 },
+            new Product { Id = 5, Name = "Chef Anton's Gumbo Mix", UnitPrice = 50.00m, UnitsInStock = 20 }
         );
     }
 }

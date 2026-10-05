@@ -40,6 +40,7 @@ public class NorthWindSalesContext(IOptions<DBOptions> dbOptions) : DbContext,
         modelBuilder.ApplyConfiguration(new ProductConfiguration());
         modelBuilder.ApplyConfiguration(new OrderConfiguration());
         modelBuilder.ApplyConfiguration(new OrderDetailConfiguration());
+        modelBuilder.Entity<NorthWind.Sales.Backend.BusinessObjects.Aggregates.OrderAggregate>().HasBaseType<Order>();
         base.OnModelCreating(modelBuilder);
     }
 
