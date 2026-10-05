@@ -1,0 +1,11 @@
+global using System;
+global using System.Collections.Generic;
+global using System.Linq;
+global using System.Threading;
+global using System.Threading.Tasks;
+global using NorthWind.DomainLogs.Entities.Interfaces;
+global using NorthWind.DomainLogs.Entities.ValueObjects;
+global using NorthWind.Sales.Backend.BusinessObjects.Aggregates;
+global using NorthWind.Sales.Backend.BusinessObjects.Entities;
+global using NorthWind.Sales.Backend.BusinessObjects.Interfaces.Repositories;
+global using NorthWind.Sales.Backend.BusinessObjects.ValueObjects;

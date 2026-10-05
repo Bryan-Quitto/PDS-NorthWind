@@ -1,0 +1,14 @@
+global using System;
+global using System.Collections.Generic;
+global using System.Linq;
+global using System.Threading;
+global using System.Threading.Tasks;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.EntityFrameworkCore.Design;
+global using Microsoft.EntityFrameworkCore.Metadata.Builders;
+global using Microsoft.Extensions.Options;
+global using NorthWind.DomainLogs.Entities.ValueObjects;
+global using NorthWind.Entities;
+global using NorthWind.Sales.Backend.BusinessObjects.Entities;
+global using NorthWind.Sales.Backend.Repositories.Entities;
+global using NorthWind.Sales.Backend.Repositories.Interfaces;

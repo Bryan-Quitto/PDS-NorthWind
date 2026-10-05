@@ -1,0 +1,11 @@
+<Router AppAssembly="@typeof(App).Assembly" AdditionalAssemblies="[typeof(NorthWind.Sales.Frontend.Views.CreateOrder).Assembly]">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(NorthWind.Sales.Frontend.Views.MainLayout)"/>
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+    </Found>
+    <NotFound>
+        <LayoutView Layout="@typeof(NorthWind.Sales.Frontend.Views.MainLayout)">
+            <p role="alert" class="alert alert-warning m-4">Página no encontrada.</p>
+        </LayoutView>
+    </NotFound>
+</Router>

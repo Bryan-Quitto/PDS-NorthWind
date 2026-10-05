@@ -1,0 +1,24 @@
+@inherits LayoutComponentBase
+
+<div class="page">
+    <div class="sidebar">
+        <NavMenu Title="NorthWind Sales">
+            <NavMenuItem Href="" Match="NavLinkMatch.All" IconClass="oi oi-home">
+                Inicio
+            </NavMenuItem>
+            <NavMenuItem Href="createorder" Match="NavLinkMatch.Prefix" IconClass="oi oi-plus">
+                Nueva Orden
+            </NavMenuItem>
+        </NavMenu>
+    </div>
+
+    <main>
+        <div class="top-row px-4">
+            <span class="text-secondary small">NorthWind Clean Architecture .NET 10</span>
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>

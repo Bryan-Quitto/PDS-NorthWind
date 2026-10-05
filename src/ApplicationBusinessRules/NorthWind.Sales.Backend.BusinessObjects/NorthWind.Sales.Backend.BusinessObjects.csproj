@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\EnterpriseBusinessRules\NorthWind.Entities\NorthWind.Entities.csproj" />
+    <ProjectReference Include="..\..\EnterpriseBusinessRules\NorthWind.Sales.Entities\NorthWind.Sales.Entities.csproj" />
+    <ProjectReference Include="..\..\EnterpriseBusinessRules\NorthWind.Validation.Entities\NorthWind.Validation.Entities.csproj" />
+    <ProjectReference Include="..\..\EnterpriseBusinessRules\NorthWind.Exceptions.Entities\NorthWind.Exceptions.Entities.csproj" PrivateAssets="all" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>

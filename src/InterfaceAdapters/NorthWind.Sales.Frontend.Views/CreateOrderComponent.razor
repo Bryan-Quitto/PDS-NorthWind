@@ -1,0 +1,188 @@
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">@ViewMessages.CreateOrderTitle</h5>
+    </div>
+    <div class="card-body">
+        <ExceptionDisplay Exception="@_currentException" />
+
+        @if (_createdOrderId.HasValue)
+        {
+            <div class="alert alert-success d-flex align-items-center justify-content-between" role="alert">
+                <div>
+                    <h5 class="alert-heading mb-1">@ViewMessages.OrderSuccessTitle</h5>
+                    <p class="mb-0">@ViewMessages.OrderSuccessMessage<strong>@_createdOrderId.Value</strong></p>
+                </div>
+                <button type="button" class="btn btn-outline-success" @onclick="ResetForm">
+                    @ViewMessages.CreateAnotherOrderButton
+                </button>
+            </div>
+        }
+        else
+        {
+            <EditForm Model="@Model" OnValidSubmit="HandleValidSubmit">
+                <ModelValidator T="CreateOrderViewModel" />
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label for="customerId" class="form-label fw-bold">@ViewMessages.CustomerIdLabel</label>
+                        <InputText id="customerId" class="form-control" @bind-Value="Model.CustomerId" placeholder="@ViewMessages.CustomerIdPlaceholder" maxlength="5" />
+                        <ValidationMessage For="@(() => Model.CustomerId)" class="text-danger small mt-1" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="shipAddress" class="form-label fw-bold">@ViewMessages.ShipAddressLabel</label>
+                        <InputText id="shipAddress" class="form-control" @bind-Value="Model.ShipAddress" />
+                        <ValidationMessage For="@(() => Model.ShipAddress)" class="text-danger small mt-1" />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="shipCity" class="form-label fw-bold">@ViewMessages.ShipCityLabel</label>
+                        <InputText id="shipCity" class="form-control" @bind-Value="Model.ShipCity" />
+                        <ValidationMessage For="@(() => Model.ShipCity)" class="text-danger small mt-1" />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="shipCountry" class="form-label fw-bold">@ViewMessages.ShipCountryLabel</label>
+                        <InputText id="shipCountry" class="form-control" @bind-Value="Model.ShipCountry" />
+                        <ValidationMessage For="@(() => Model.ShipCountry)" class="text-danger small mt-1" />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="shipPostalCode" class="form-label fw-bold">@ViewMessages.ShipPostalCodeLabel</label>
+                        <InputText id="shipPostalCode" class="form-control" @bind-Value="Model.ShipPostalCode" />
+                        <ValidationMessage For="@(() => Model.ShipPostalCode)" class="text-danger small mt-1" />
+                    </div>
+                </div>
+
+                <div class="card bg-light mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span class="fw-bold">@ViewMessages.OrderDetailsTitle</span>
+                        <button type="button" class="btn btn-sm btn-outline-primary" @onclick="AddDetail">
+                            + @ViewMessages.AddProductButton
+                        </button>
+                    </div>
+                    <div class="card-body p-0">
+                        @if (Model.OrderDetails.Count == 0)
+                        {
+                            <div class="p-3 text-muted text-center">
+                                @ViewMessages.EmptyOrderDetailsWarning
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="width: 30%;">@ViewMessages.ProductIdLabel</th>
+                                            <th style="width: 30%;">@ViewMessages.UnitPriceLabel</th>
+                                            <th style="width: 25%;">@ViewMessages.QuantityLabel</th>
+                                            <th style="width: 15%; text-align: center;">Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var detail in Model.OrderDetails)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <InputNumber class="form-control form-control-sm" @bind-Value="detail.ProductId" />
+                                                    <ValidationMessage For="@(() => detail.ProductId)" class="text-danger small" />
+                                                </td>
+                                                <td>
+                                                    <InputNumber class="form-control form-control-sm" @bind-Value="detail.UnitPrice" step="0.01" />
+                                                    <ValidationMessage For="@(() => detail.UnitPrice)" class="text-danger small" />
+                                                </td>
+                                                <td>
+                                                    <InputNumber class="form-control form-control-sm" @bind-Value="detail.Quantity" />
+                                                    <ValidationMessage For="@(() => detail.Quantity)" class="text-danger small" />
+                                                </td>
+                                                <td class="text-center">
+                                                    <button type="button" class="btn btn-sm btn-outline-danger" @onclick="() => RemoveDetail(detail)">
+                                                        @ViewMessages.RemoveProductButton
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="submit" class="btn btn-primary px-4" disabled="@_isSubmitting">
+                        @if (_isSubmitting)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            @ViewMessages.SubmittingOrderButton
+                        }
+                        else
+                        {
+                            @ViewMessages.SubmitOrderButton
+                        }
+                    </button>
+                </div>
+            </EditForm>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public CreateOrderViewModel Model { get; set; } = new();
+
+    [Inject]
+    public ICreateOrderGateway OrderGateway { get; set; } = default!;
+
+    private Exception? _currentException;
+    private int? _createdOrderId;
+    private bool _isSubmitting;
+
+    protected override void OnInitialized()
+    {
+        if (Model.OrderDetails.Count == 0)
+        {
+            Model.AddDetail();
+        }
+    }
+
+    private void AddDetail()
+    {
+        Model.AddDetail();
+    }
+
+    private void RemoveDetail(CreateOrderDetailViewModel detail)
+    {
+        Model.RemoveDetail(detail);
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        _currentException = null;
+        _isSubmitting = true;
+
+        try
+        {
+            var dto = Model.ToDto();
+            var orderId = await OrderGateway.CreateOrderAsync(dto);
+            _createdOrderId = orderId;
+        }
+        catch (Exception ex)
+        {
+            _currentException = ex;
+        }
+        finally
+        {
+            _isSubmitting = false;
+        }
+    }
+
+    private void ResetForm()
+    {
+        _createdOrderId = null;
+        _currentException = null;
+        Model.Reset();
+        Model.AddDetail();
+    }
+}

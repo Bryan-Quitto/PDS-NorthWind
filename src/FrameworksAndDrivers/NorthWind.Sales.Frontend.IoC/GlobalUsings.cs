@@ -1,0 +1,10 @@
+global using Microsoft.Extensions.Configuration;
+global using Microsoft.Extensions.DependencyInjection;
+global using NorthWind.HttpDelegatingHandlers;
+global using NorthWind.Sales.Entities.Dtos;
+global using NorthWind.Sales.Frontend.BusinessObjects.Interfaces;
+global using NorthWind.Sales.Frontend.Views.ViewModels;
+global using NorthWind.Sales.Frontend.WebApiGateways;
+global using NorthWind.Validation.Entities.Interfaces;
+global using NorthWind.Validation.Entities.Services;
+global using NorthWind.ValidationService.FluentValidation.Services;

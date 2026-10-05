@@ -1,0 +1,27 @@
+@if (Exception != null)
+{
+    @if (Exception is ValidationException validationException && validationException.Errors.Count > 0)
+    {
+        <div class="alert alert-danger" role="alert">
+            <h6 class="alert-heading fw-bold">Por favor corrija los siguientes errores:</h6>
+            <ul class="mb-0 ps-3">
+                @foreach (var error in validationException.Errors)
+                {
+                    <li><strong>@error.PropertyName:</strong> @error.ErrorMessage</li>
+                }
+            </ul>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-danger" role="alert">
+            <h6 class="alert-heading fw-bold">Ha ocurrido un error</h6>
+            <p class="mb-0">@Exception.Message</p>
+        </div>
+    }
+}
+
+@code {
+    [Parameter]
+    public Exception? Exception { get; set; }
+}
