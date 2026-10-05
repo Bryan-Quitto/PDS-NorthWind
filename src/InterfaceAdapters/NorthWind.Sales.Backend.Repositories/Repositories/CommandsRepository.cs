@@ -9,32 +9,19 @@ public class CommandsRepository(INorthWindSalesCommandsDataContext context) : IC
 {
     public async Task CreateOrderAsync(OrderAggregate order, CancellationToken cancellationToken = default)
     {
-        var orderEntity = new Order
-        {
-            CustomerId = order.CustomerId,
-            ShipAddress = order.ShipAddress,
-            ShipCity = order.ShipCity,
-            ShipCountry = order.ShipCountry,
-            ShipPostalCode = order.ShipPostalCode,
-            ShippingType = order.ShippingType,
-            DiscountType = order.DiscountType,
-            Discount = order.Discount,
-            OrderDate = order.OrderDate
-        };
+        // 1. Agregar la instancia de la orden al contexto de EF Core
+        await context.AddOrderAsync(order, cancellationToken);
 
-        await context.AddOrderAsync(orderEntity, cancellationToken);
-
-        // Al persistirse el contexto se sincroniza el Id generado
-        order.Id = orderEntity.Id;
-
+        // 2. Vincular cada detalle directamente a la referencia en memoria 'order' (no a un escalar OrderId todavía no generado)
         var details = order.OrderDetails.Select(d => new Entities.OrderDetail
         {
-            OrderId = orderEntity.Id,
+            Order = order,
             ProductId = d.ProductId,
             UnitPrice = d.UnitPrice,
             Quantity = d.Quantity
         }).ToList();
 
+        // 3. Agregar los detalles vinculados
         await context.AddOrderDetailsAsync(details, cancellationToken);
     }
 }

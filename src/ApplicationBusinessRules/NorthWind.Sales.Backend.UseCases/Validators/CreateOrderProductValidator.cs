@@ -1,6 +1,7 @@
 using NorthWind.Sales.Backend.BusinessObjects.Interfaces.Repositories;
 using NorthWind.Sales.Entities.Dtos;
 using NorthWind.Validation.Entities.Abstractions;
+using NorthWind.Validation.Entities.Enums;
 using NorthWind.Validation.Entities.Interfaces;
 using NorthWind.Validation.Entities.ValueObjects;
 
@@ -13,7 +14,7 @@ public class CreateOrderProductValidator : AbstractModelValidator<CreateOrderDto
     public CreateOrderProductValidator(
         IValidationService<CreateOrderDto> validationService,
         IQueriesRepository queriesRepository)
-        : base(validationService)
+        : base(validationService, ValidationConstraint.ValidateIfThereAreNoPreviousErrors)
     {
         this.queriesRepository = queriesRepository;
     }
@@ -32,9 +33,16 @@ public class CreateOrderProductValidator : AbstractModelValidator<CreateOrderDto
         var stockList = await queriesRepository.GetProductsUnitsInStockAsync(productIds, cancellationToken);
         var stockMap = stockList.ToDictionary(s => s.ProductId, s => s.UnitsInStock);
 
+        // Agrupación para validar suma consolidada de unidades requeridas por producto
+        var groupedQuantities = model.OrderDetails
+            .GroupBy(d => d.ProductId)
+            .ToDictionary(g => g.Key, g => g.Sum(d => d.Quantity));
+
         for (int i = 0; i < model.OrderDetails.Count; i++)
         {
             var detail = model.OrderDetails[i];
+
+            // 1. Validar existencia del producto
             if (!stockMap.TryGetValue(detail.ProductId, out var unitsInStock))
             {
                 errors.Add(new ValidationError(
@@ -42,11 +50,12 @@ public class CreateOrderProductValidator : AbstractModelValidator<CreateOrderDto
                     $"El producto con ID {detail.ProductId} no existe en el catálogo."
                 ));
             }
-            else if (unitsInStock < detail.Quantity)
+            // 2. Validar existencias acumuladas contra el inventario
+            else if (groupedQuantities.TryGetValue(detail.ProductId, out var totalRequested) && totalRequested > unitsInStock)
             {
                 errors.Add(new ValidationError(
                     $"OrderDetails[{i}].Quantity",
-                    $"No hay existencias suficientes para el producto con ID {detail.ProductId}. Existencias actuales: {unitsInStock}, solicitadas: {detail.Quantity}."
+                    $"Las unidades solicitadas en la orden superan las existencias para el producto {detail.ProductId}. Existencias: {unitsInStock}, solicitadas en total: {totalRequested}."
                 ));
             }
         }

@@ -1,6 +1,7 @@
 using NorthWind.Sales.Backend.BusinessObjects.Interfaces.Repositories;
 using NorthWind.Sales.Entities.Dtos;
 using NorthWind.Validation.Entities.Abstractions;
+using NorthWind.Validation.Entities.Enums;
 using NorthWind.Validation.Entities.Interfaces;
 
 namespace NorthWind.Sales.Backend.UseCases.Validators;
@@ -10,7 +11,7 @@ public class CreateOrderCustomerValidator : AbstractModelValidator<CreateOrderDt
     public CreateOrderCustomerValidator(
         IValidationService<CreateOrderDto> validationService,
         IQueriesRepository queriesRepository)
-        : base(validationService)
+        : base(validationService, ValidationConstraint.ValidateIfThereAreNoPreviousErrors)
     {
         RuleFor(o => o.CustomerId)
             .MustAsync(async (customerId, ct) =>

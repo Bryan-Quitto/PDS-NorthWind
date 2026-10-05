@@ -10,7 +10,7 @@ public class MailService(IOptions<SmtpOptions> options) : IMailService
 {
     private readonly SmtpOptions smtpOptions = options.Value;
 
-    public async Task SendEmailAsync(string to, string subject, string body, CancellationToken cancellationToken = default)
+    public async Task SendMailToAdministrator(string subject, string body, CancellationToken cancellationToken = default)
     {
         using var client = new SmtpClient(smtpOptions.Host, smtpOptions.Port)
         {
@@ -22,7 +22,7 @@ public class MailService(IOptions<SmtpOptions> options) : IMailService
             client.Credentials = new NetworkCredential(smtpOptions.UserName, smtpOptions.Password);
         }
 
-        using var message = new MailMessage(smtpOptions.From, to, subject, body)
+        using var message = new MailMessage(smtpOptions.From, smtpOptions.AdministratorEmail, subject, body)
         {
             IsBodyHtml = true
         };
