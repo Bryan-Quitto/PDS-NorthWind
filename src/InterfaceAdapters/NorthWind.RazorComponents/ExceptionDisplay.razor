@@ -1,13 +1,20 @@
 @if (Exception != null)
 {
-    @if (Exception is ValidationException validationException && validationException.Errors.Count > 0)
+    var errors = GetValidationErrors();
+    @if (errors.Count > 0)
     {
         <div class="alert alert-danger" role="alert">
             <h6 class="alert-heading fw-bold">Por favor corrija los siguientes errores:</h6>
             <ul class="mb-0 ps-3">
-                @foreach (var error in validationException.Errors)
+                @foreach (var error in errors)
                 {
-                    <li><strong>@error.PropertyName:</strong> @error.ErrorMessage</li>
+                    <li>
+                        @if (!string.IsNullOrWhiteSpace(error.PropertyName))
+                        {
+                            <strong>@error.PropertyName: </strong>
+                        }
+                        @error.ErrorMessage
+                    </li>
                 }
             </ul>
         </div>
@@ -24,4 +31,33 @@
 @code {
     [Parameter]
     public Exception? Exception { get; set; }
+
+    private IReadOnlyList<ValidationError> GetValidationErrors()
+    {
+        if (Exception == null) return [];
+
+        if (Exception.Data.Contains("Errors"))
+        {
+            var dataErrors = Exception.Data["Errors"];
+
+            if (dataErrors is IEnumerable<ValidationError> validationErrors)
+            {
+                return validationErrors.ToList();
+            }
+
+            if (dataErrors is IEnumerable<string> stringErrors)
+            {
+                return stringErrors.Select(msg => new ValidationError(string.Empty, msg)).ToList();
+            }
+
+            if (dataErrors is IDictionary<string, string[]> dictErrors)
+            {
+                return dictErrors
+                    .SelectMany(kvp => kvp.Value.Select(msg => new ValidationError(kvp.Key, msg)))
+                    .ToList();
+            }
+        }
+
+        return [];
+    }
 }

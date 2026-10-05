@@ -16,7 +16,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\EnterpriseBusinessRules\NorthWind.Validation.Entities\NorthWind.Validation.Entities.csproj" />
-    <ProjectReference Include="..\..\EnterpriseBusinessRules\NorthWind.Exceptions.Entities\NorthWind.Exceptions.Entities.csproj" />
   </ItemGroup>
 
 </Project>

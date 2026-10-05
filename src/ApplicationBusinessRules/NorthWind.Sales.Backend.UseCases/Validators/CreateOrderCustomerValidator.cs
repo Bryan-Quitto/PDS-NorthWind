@@ -20,6 +20,15 @@ public class CreateOrderCustomerValidator : AbstractModelValidator<CreateOrderDt
                     return false;
                 }
                 return await queriesRepository.CustomerExistsAsync(customerId, ct);
-            }, "El cliente especificado no existe en el sistema.");
+            }, "El cliente especificado no existe en el sistema.")
+            .MustAsync(async (customerId, ct) =>
+            {
+                if (string.IsNullOrWhiteSpace(customerId))
+                {
+                    return true;
+                }
+                var balance = await queriesRepository.GetCustomerCurrentBalanceAsync(customerId, ct);
+                return balance <= 0;
+            }, "El cliente tiene un saldo pendiente y no se puede procesar la orden.");
     }
 }

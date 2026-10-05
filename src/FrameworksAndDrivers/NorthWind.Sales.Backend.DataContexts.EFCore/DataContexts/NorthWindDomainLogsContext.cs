@@ -21,7 +21,7 @@ public class NorthWindDomainLogsContext(IOptions<DBOptions> dbOptions) : DbConte
     {
         if (!optionsBuilder.IsConfigured)
         {
-            optionsBuilder.UseSqlServer(options.NorthWindDomainLogsDB);
+            optionsBuilder.UseSqlServer(options.DomainLogsConnectionString);
         }
     }
 

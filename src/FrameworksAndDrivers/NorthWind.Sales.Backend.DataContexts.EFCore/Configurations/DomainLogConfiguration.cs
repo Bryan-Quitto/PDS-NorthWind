@@ -10,8 +10,7 @@ public class DomainLogConfiguration : IEntityTypeConfiguration<DomainLog>
     {
         builder.ToTable("DomainLogs");
         builder.HasKey(l => l.Id);
-        builder.Property(l => l.Action).IsRequired().HasMaxLength(100);
-        builder.Property(l => l.Description).IsRequired().HasMaxLength(500);
-        builder.Property(l => l.User).IsRequired().HasMaxLength(50);
+        builder.Property(l => l.CreatedDate).IsRequired();
+        builder.Property(l => l.Information).IsRequired();
     }
 }

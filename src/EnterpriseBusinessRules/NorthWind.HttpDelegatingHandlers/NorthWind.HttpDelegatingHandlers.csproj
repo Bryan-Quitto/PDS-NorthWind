@@ -2,7 +2,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NorthWind.Validation.Entities\NorthWind.Validation.Entities.csproj" />
-    <ProjectReference Include="..\NorthWind.Exceptions.Entities\NorthWind.Exceptions.Entities.csproj" PrivateAssets="all" />
   </ItemGroup>
 
   <PropertyGroup>

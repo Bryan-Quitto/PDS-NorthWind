@@ -3,18 +3,14 @@ namespace NorthWind.DomainLogs.Entities.ValueObjects;
 public class DomainLog
 {
     public int Id { get; set; }
-    public DateTime Created { get; set; } = DateTime.UtcNow;
-    public string Action { get; set; } = string.Empty;
-    public string Description { get; set; } = string.Empty;
-    public string User { get; set; } = string.Empty;
+    public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+    public string Information { get; set; } = string.Empty;
 
     public DomainLog() { }
 
-    public DomainLog(string action, string description, string user)
+    public DomainLog(string information)
     {
-        Created = DateTime.UtcNow;
-        Action = action;
-        Description = description;
-        User = user;
+        CreatedDate = DateTime.UtcNow;
+        Information = information;
     }
 }

@@ -12,13 +12,14 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
         builder.HasKey(c => c.Id);
         builder.Property(c => c.Id).HasMaxLength(5).IsFixedLength();
         builder.Property(c => c.Name).IsRequired().HasMaxLength(50);
+        builder.Property(c => c.CurrentBalance).HasPrecision(18, 2);
 
         builder.HasData(
-            new Customer { Id = "ALFKI", Name = "Alfreds Futterkiste" },
-            new Customer { Id = "ANATR", Name = "Ana Trujillo Emparedados y helados" },
-            new Customer { Id = "ANTON", Name = "Antonio Moreno Taquería" },
-            new Customer { Id = "AROUT", Name = "Around the Horn" },
-            new Customer { Id = "BERGS", Name = "Berglunds snabbköp" }
+            new Customer { Id = "ALFKI", Name = "Alfreds Futterkiste", CurrentBalance = 0m },
+            new Customer { Id = "ANATR", Name = "Ana Trujillo Emparedados y helados", CurrentBalance = 0m },
+            new Customer { Id = "ANTON", Name = "Antonio Moreno Taqueria", CurrentBalance = 100.00m },
+            new Customer { Id = "AROUT", Name = "Around the Horn", CurrentBalance = 0m },
+            new Customer { Id = "BERGS", Name = "Berglunds snabbkop", CurrentBalance = 0m }
         );
     }
 }

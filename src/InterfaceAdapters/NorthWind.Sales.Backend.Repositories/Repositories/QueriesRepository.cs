@@ -12,6 +12,16 @@ public class QueriesRepository(INorthWindSalesQueriesDataContext context) : IQue
         return Task.FromResult(exists);
     }
 
+    public Task<decimal> GetCustomerCurrentBalanceAsync(string customerId, CancellationToken cancellationToken = default)
+    {
+        var balance = context.Customers
+            .Where(c => c.Id == customerId)
+            .Select(c => c.CurrentBalance)
+            .FirstOrDefault();
+
+        return Task.FromResult(balance);
+    }
+
     public Task<IReadOnlyList<ProductUnitsInStock>> GetProductsUnitsInStockAsync(
         IEnumerable<int> productIds,
         CancellationToken cancellationToken = default)

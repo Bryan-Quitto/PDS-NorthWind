@@ -17,11 +17,4 @@
     <ProjectReference Include="..\..\InterfaceAdapters\NorthWind.Sales.Frontend.Views\NorthWind.Sales.Frontend.Views.csproj" />
   </ItemGroup>
 
-  <!-- Eliminar la referencia transitiva del shared framework que no aplica a WebAssembly -->
-  <Target Name="RemoveAspNetCoreAppFrameworkReference" AfterTargets="AddTransitiveFrameworkReferences">
-    <ItemGroup>
-      <FrameworkReference Remove="Microsoft.AspNetCore.App" />
-    </ItemGroup>
-  </Target>
-
 </Project>

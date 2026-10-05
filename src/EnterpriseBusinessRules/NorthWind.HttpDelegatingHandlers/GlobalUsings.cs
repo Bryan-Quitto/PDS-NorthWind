@@ -6,5 +6,4 @@ global using System.Net.Http.Json;
 global using System.Text.Json;
 global using System.Threading;
 global using System.Threading.Tasks;
-global using NorthWind.Exceptions.Entities.Exceptions;
 global using NorthWind.Validation.Entities.ValueObjects;

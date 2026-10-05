@@ -22,17 +22,15 @@ public class CreateOrderInteractor(
 {
     public async Task HandleAsync(CreateOrderDto orderDto, CancellationToken cancellationToken = default)
     {
-        // 1. Validaciones agnósticas (formato y reglas de negocio contra BD)
+        // 1. Validaciones agnósticas (formato, existencia y adeudo de cliente, inventario indexado)
         await GuardModel.AgainstErrorsAsync(validatorHub, orderDto, cancellationToken);
 
         // 2. Auditoría inicial de dominio
         await domainLogger.LogInformationAsync(new DomainLog(
-            action: "CreateOrder.Start",
-            description: $"Iniciando creación de orden para el cliente '{orderDto.CustomerId}' con {orderDto.OrderDetails.Count} partidas.",
-            user: "System"
+            $"Iniciando creacion de orden para el cliente '{orderDto.CustomerId}' con {orderDto.OrderDetails.Count} partidas."
         ), cancellationToken);
 
-        // 3. Crear el agregado de dominio y consolidar partidas duplicadas si existieran
+        // 3. Crear el agregado de dominio y consolidar partidas duplicadas
         var orderAggregate = OrderAggregate.From(orderDto);
 
         // 4. Persistir a través del repositorio de comandos
@@ -43,9 +41,7 @@ public class CreateOrderInteractor(
 
         // 6. Auditoría final de dominio
         await domainLogger.LogInformationAsync(new DomainLog(
-            action: "CreateOrder.Completed",
-            description: $"Orden {orderAggregate.Id} creada y persistida exitosamente para el cliente '{orderAggregate.CustomerId}'.",
-            user: "System"
+            $"Orden {orderAggregate.Id} creada y persistida exitosamente para el cliente '{orderAggregate.CustomerId}'."
         ), cancellationToken);
 
         // 7. Notificar evento de dominio si se trata de una orden especial (> 3 partidas)

@@ -1,7 +1,6 @@
 global using System.ComponentModel.DataAnnotations;
 global using Microsoft.AspNetCore.Components;
 global using Microsoft.AspNetCore.Components.Forms;
-global using NorthWind.Exceptions.Entities.Exceptions;
 global using NorthWind.RazorComponents;
 global using NorthWind.Sales.Entities.Dtos;
 global using NorthWind.Sales.Frontend.BusinessObjects.Interfaces;

@@ -30,7 +30,7 @@ public class NorthWindSalesContext(IOptions<DBOptions> dbOptions) : DbContext,
     {
         if (!optionsBuilder.IsConfigured)
         {
-            optionsBuilder.UseSqlServer(options.NorthWindDB);
+            optionsBuilder.UseSqlServer(options.ConnectionString);
         }
     }
 
