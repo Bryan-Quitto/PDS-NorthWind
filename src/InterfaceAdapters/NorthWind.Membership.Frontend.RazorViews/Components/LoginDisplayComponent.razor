@@ -1,0 +1,15 @@
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager Navigation
+
+<AuthorizeView>
+    <Authorized>
+        <span class="me-3 text-dark fw-bold">
+            Hola, @(context.User.FindFirst("FullName")?.Value ?? context.User.Identity?.Name ?? "Usuario")!
+        </span>
+        <a href="/user/logout" class="btn btn-sm btn-outline-danger">Cerrar Sesión</a>
+    </Authorized>
+    <NotAuthorized>
+        <a href="/user/login" class="btn btn-sm btn-outline-primary me-2">Iniciar Sesión</a>
+        <a href="/user/register" class="btn btn-sm btn-primary">Registrarse</a>
+    </NotAuthorized>
+</AuthorizeView>

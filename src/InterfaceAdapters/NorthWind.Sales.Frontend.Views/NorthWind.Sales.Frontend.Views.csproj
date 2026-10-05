@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="10.0.12" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.12" />
   </ItemGroup>
 
@@ -19,6 +20,7 @@
     <ProjectReference Include="..\..\ApplicationBusinessRules\NorthWind.Sales.Frontend.BusinessObjects\NorthWind.Sales.Frontend.BusinessObjects.csproj" />
     <ProjectReference Include="..\NorthWind.RazorComponents\NorthWind.RazorComponents.csproj" />
     <ProjectReference Include="..\..\EnterpriseBusinessRules\NorthWind.Sales.Validators.Entities\NorthWind.Sales.Validators.Entities.csproj" />
+    <ProjectReference Include="..\NorthWind.Membership.Frontend.RazorViews\NorthWind.Membership.Frontend.RazorViews.csproj" />
   </ItemGroup>
 
 </Project>

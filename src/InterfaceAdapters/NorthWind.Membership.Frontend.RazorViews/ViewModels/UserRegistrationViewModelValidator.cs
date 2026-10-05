@@ -1,0 +1,34 @@
+using NorthWind.Membership.Entities.Resources;
+using NorthWind.Validation.Entities.Abstractions;
+using NorthWind.Validation.Entities.Interfaces;
+
+namespace NorthWind.Membership.Frontend.RazorViews.ViewModels;
+
+public class UserRegistrationViewModelValidator : AbstractModelValidator<UserRegistrationViewModel>
+{
+    public UserRegistrationViewModelValidator(IValidationService<UserRegistrationViewModel> validationService)
+        : base(validationService)
+    {
+        RuleFor(u => u.FirstName)
+            .NotEmpty(MembershipMessages.FirstNameRequired);
+
+        RuleFor(u => u.LastName)
+            .NotEmpty(MembershipMessages.LastNameRequired);
+
+        RuleFor(u => u.Email)
+            .NotEmpty(MembershipMessages.EmailRequired)
+            .Must(email => !string.IsNullOrWhiteSpace(email) && email.Contains('@') && email.Contains('.'), MembershipMessages.EmailInvalid);
+
+        RuleFor(u => u.Password)
+            .NotEmpty(MembershipMessages.PasswordRequired)
+            .Length(6, 100, MembershipMessages.PasswordTooShort)
+            .Must(p => !string.IsNullOrEmpty(p) && p.Any(char.IsLower), MembershipMessages.PasswordRequiresLower)
+            .Must(p => !string.IsNullOrEmpty(p) && p.Any(char.IsUpper), MembershipMessages.PasswordRequiresUpper)
+            .Must(p => !string.IsNullOrEmpty(p) && p.Any(char.IsDigit), MembershipMessages.PasswordRequiresDigit)
+            .Must(p => !string.IsNullOrEmpty(p) && p.Any(ch => !char.IsLetterOrDigit(ch)), MembershipMessages.PasswordRequiresNonAlphanumeric);
+
+        RuleFor(u => u.PasswordConfirmation)
+            .NotEmpty("La confirmación de la contraseña es requerida.")
+            .Equal(u => u.Password, "La contraseña y la confirmación no coinciden.");
+    }
+}

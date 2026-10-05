@@ -4,6 +4,6 @@ public class DBOptions
 {
     public const string SectionKey = "DBOptions";
 
-    public string ConnectionString { get; set; } = "Server=(localdb)\\mssqllocaldb;Database=NorthWind;Trusted_Connection=True;MultipleActiveResultSets=true";
-    public string DomainLogsConnectionString { get; set; } = "Server=(localdb)\\mssqllocaldb;Database=NorthWindDomainLogs;Trusted_Connection=True;MultipleActiveResultSets=true";
+    public string ConnectionString { get; set; } = "Server=localhost;Database=NorthWindDB;Trusted_Connection=True;TrustServerCertificate=True;";
+    public string DomainLogsConnectionString { get; set; } = "Server=localhost;Database=NorthWindLogsDB;Trusted_Connection=True;TrustServerCertificate=True;";
 }

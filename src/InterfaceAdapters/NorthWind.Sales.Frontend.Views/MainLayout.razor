@@ -6,15 +6,22 @@
             <NavMenuItem Href="" Match="NavLinkMatch.All" IconClass="oi oi-home">
                 Inicio
             </NavMenuItem>
-            <NavMenuItem Href="createorder" Match="NavLinkMatch.Prefix" IconClass="oi oi-plus">
-                Nueva Orden
-            </NavMenuItem>
+            <AuthorizeView>
+                <Authorized>
+                    <NavMenuItem Href="createorder" Match="NavLinkMatch.Prefix" IconClass="oi oi-plus">
+                        Nueva Orden
+                    </NavMenuItem>
+                </Authorized>
+            </AuthorizeView>
         </NavMenu>
     </div>
 
     <main>
-        <div class="top-row px-4">
+        <div class="top-row px-4 d-flex justify-content-between align-items-center">
             <span class="text-secondary small">NorthWind Clean Architecture .NET 10</span>
+            <div>
+                <NorthWind.Membership.Frontend.RazorViews.Components.LoginDisplayComponent />
+            </div>
         </div>
 
         <article class="content px-4">

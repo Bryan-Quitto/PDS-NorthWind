@@ -12,5 +12,6 @@ public class DomainLogConfiguration : IEntityTypeConfiguration<DomainLog>
         builder.HasKey(l => l.Id);
         builder.Property(l => l.CreatedDate).IsRequired();
         builder.Property(l => l.Information).IsRequired();
+        builder.Property(l => l.UserName).HasMaxLength(256);
     }
 }

@@ -27,6 +27,13 @@ public class MailService(IOptions<SmtpOptions> options) : IMailService
             IsBodyHtml = true
         };
 
-        await client.SendMailAsync(message, cancellationToken);
+        try
+        {
+            await client.SendMailAsync(message, cancellationToken);
+        }
+        catch
+        {
+            throw;
+        }
     }
 }

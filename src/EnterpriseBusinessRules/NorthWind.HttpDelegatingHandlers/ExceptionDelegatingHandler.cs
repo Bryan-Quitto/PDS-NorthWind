@@ -50,8 +50,14 @@ public class ExceptionDelegatingHandler : DelegatingHandler
         if (response.StatusCode == HttpStatusCode.InternalServerError)
         {
             var problemDetails = await response.Content.ReadFromJsonAsync<ProblemDetailsDto>(JsonOptions, cancellationToken);
+            var detail = problemDetails?.Detail ?? "Consulte al administrador.";
+            var title = problemDetails?.Title ?? "El servicio no se encuentra disponible.";
+            var message = !string.IsNullOrWhiteSpace(problemDetails?.Title) && !string.IsNullOrWhiteSpace(problemDetails?.Detail)
+                ? $"{title}\n{detail}"
+                : (problemDetails?.Detail ?? problemDetails?.Title ?? "El servicio no se encuentra disponible.");
+
             var ex = new HttpRequestException(
-                problemDetails?.Detail ?? "Error interno del servidor.",
+                message,
                 null,
                 response.StatusCode);
 

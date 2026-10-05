@@ -10,7 +10,10 @@ public class NorthWindSalesContextFactory : IDesignTimeDbContextFactory<NorthWin
 {
     public NorthWindSalesContext CreateDbContext(string[] args)
     {
-        var options = Microsoft.Extensions.Options.Options.Create(new DBOptions());
+        var options = Microsoft.Extensions.Options.Options.Create(new DBOptions
+        {
+            ConnectionString = "Server=localhost;Database=NorthWindDB;Trusted_Connection=True;TrustServerCertificate=True;"
+        });
         return new NorthWindSalesContext(options);
     }
 }

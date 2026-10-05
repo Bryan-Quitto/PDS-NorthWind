@@ -1,0 +1,17 @@
+@page "/user/logout"
+@inject UserLoginViewModel ViewModel
+@inject NavigationManager Navigation
+
+<PageTitle>Cerrando sesión - NorthWind</PageTitle>
+
+<div class="container mt-4 text-center">
+    <p>Cerrando sesión...</p>
+</div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await ViewModel.LogoutAsync();
+        Navigation.NavigateTo("/user/login");
+    }
+}

@@ -38,6 +38,14 @@ public static class DependencyContainer
         services.Configure<DBOptions>(configuration.GetSection(DBOptions.SectionKey));
         services.Configure<SmtpOptions>(configuration.GetSection(SmtpOptions.SectionKey));
 
+        // Servicios transversales de arquitectura
+        NorthWind.Transactions.Entities.DependencyInjection.TransactionServiceCollectionExtensions.AddTransactionServices(services);
+        NorthWind.UserServices.DependencyInjection.UserServiceCollectionExtensions.AddUserServices(services);
+
+        // Subsistema de Membresía
+        NorthWind.Membership.Backend.Core.DependencyInjection.MembershipCoreServiceCollectionExtensions.AddMembershipCoreServices(services, configuration);
+        NorthWind.Membership.Backend.AspNetIdentity.DependencyInjection.MembershipAspNetIdentityServiceCollectionExtensions.AddMembershipAspNetIdentityServices(services, configuration);
+
         // 2. DataContexts de EF Core
         services.AddScoped<NorthWindSalesContext>();
         services.AddScoped<INorthWindSalesCommandsDataContext>(sp => sp.GetRequiredService<NorthWindSalesContext>());
@@ -78,6 +86,7 @@ public static class DependencyContainer
 
     public static WebApplication MapNorthWindSalesEndpoints(this WebApplication app)
     {
+        NorthWind.Membership.Backend.Core.DependencyInjection.MembershipCoreServiceCollectionExtensions.MapMembershipEndpoints(app);
         app.UseCreateOrderController();
         return app;
     }

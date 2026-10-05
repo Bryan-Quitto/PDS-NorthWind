@@ -8,8 +8,17 @@
         <p class="col-md-8 fs-4 text-muted">
             Sistema empresarial implementado con Clean Architecture y .NET 10.
         </p>
-        <a class="btn btn-primary btn-lg px-4" href="createorder" role="button">
-            Registrar Nueva Orden
-        </a>
+        <AuthorizeView>
+            <Authorized>
+                <a class="btn btn-primary btn-lg px-4" href="createorder" role="button">
+                    Registrar Nueva Orden
+                </a>
+            </Authorized>
+            <NotAuthorized>
+                <a class="btn btn-primary btn-lg px-4" href="user/login" role="button">
+                    Iniciar Sesión para Ordenar
+                </a>
+            </NotAuthorized>
+        </AuthorizeView>
     </div>
 </div>

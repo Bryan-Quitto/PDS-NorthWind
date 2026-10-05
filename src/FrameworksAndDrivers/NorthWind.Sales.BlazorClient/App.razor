@@ -1,11 +1,21 @@
-<Router AppAssembly="@typeof(App).Assembly" AdditionalAssemblies="[typeof(NorthWind.Sales.Frontend.Views.CreateOrder).Assembly]">
-    <Found Context="routeData">
-        <RouteView RouteData="@routeData" DefaultLayout="@typeof(NorthWind.Sales.Frontend.Views.MainLayout)"/>
-        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
-    </Found>
-    <NotFound>
-        <LayoutView Layout="@typeof(NorthWind.Sales.Frontend.Views.MainLayout)">
-            <p role="alert" class="alert alert-warning m-4">Página no encontrada.</p>
-        </LayoutView>
-    </NotFound>
-</Router>
+<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(App).Assembly" AdditionalAssemblies="[typeof(NorthWind.Sales.Frontend.Views.CreateOrder).Assembly, typeof(NorthWind.Membership.Frontend.RazorViews.Pages.UserLoginPage).Assembly]">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(NorthWind.Sales.Frontend.Views.MainLayout)">
+                <NotAuthorized>
+                    <div class="alert alert-danger m-4" role="alert">
+                        <h5>Acceso no autorizado</h5>
+                        <p>Debe iniciar sesión para acceder a este recurso.</p>
+                        <a href="/user/login" class="btn btn-primary">Iniciar Sesión</a>
+                    </div>
+                </NotAuthorized>
+            </AuthorizeRouteView>
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </Found>
+        <NotFound>
+            <LayoutView Layout="@typeof(NorthWind.Sales.Frontend.Views.MainLayout)">
+                <p role="alert" class="alert alert-warning m-4">Página no encontrada.</p>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>

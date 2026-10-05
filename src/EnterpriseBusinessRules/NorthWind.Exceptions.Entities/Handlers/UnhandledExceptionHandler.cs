@@ -16,8 +16,8 @@ public class UnhandledExceptionHandler : IExceptionHandler
         {
             Status = StatusCodes.Status500InternalServerError,
             Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.6.1",
-            Title = "Error interno no controlado",
-            Detail = exception.Message,
+            Title = "El servicio no se encuentra disponible.",
+            Detail = "Consulte al administrador.",
             Instance = httpContext.Request.Path
         };
 

@@ -101,4 +101,14 @@ public class ValidationRules<T, TProperty>(IRuleBuilder<T, TProperty> ruleBuilde
         currentRuleBuilder = currentRuleBuilder.MustAsync(predicate).WithMessage(errorMessage);
         return this;
     }
+
+    public IValidationRules<T, TProperty> Equal(Func<T, TProperty> expression, string errorMessage)
+    {
+        currentRuleBuilder = currentRuleBuilder.Must((root, prop) =>
+        {
+            var comparisonValue = expression(root);
+            return EqualityComparer<TProperty>.Default.Equals(prop, comparisonValue);
+        }).WithMessage(errorMessage);
+        return this;
+    }
 }

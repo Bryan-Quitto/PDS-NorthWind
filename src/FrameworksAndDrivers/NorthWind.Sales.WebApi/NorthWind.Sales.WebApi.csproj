@@ -3,14 +3,17 @@
   <ItemGroup>
     <ProjectReference Include="..\NorthWind.Sales.Backend.IoC\NorthWind.Sales.Backend.IoC.csproj" />
     <ProjectReference Include="..\..\EnterpriseBusinessRules\NorthWind.Exceptions.Entities\NorthWind.Exceptions.Entities.csproj" />
+    <ProjectReference Include="..\..\ApplicationBusinessRules\NorthWind.Membership.Backend.Core\NorthWind.Membership.Backend.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="DotNetEnv" Version="3.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.12" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.12">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.2.3" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.3.1" />
   </ItemGroup>
 
   <PropertyGroup>

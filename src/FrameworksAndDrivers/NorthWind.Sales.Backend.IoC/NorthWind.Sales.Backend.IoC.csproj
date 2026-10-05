@@ -8,6 +8,10 @@
     <ProjectReference Include="..\..\InterfaceAdapters\NorthWind.Sales.Backend.Presenters\NorthWind.Sales.Backend.Presenters.csproj" />
     <ProjectReference Include="..\..\InterfaceAdapters\NorthWind.Sales.Backend.Controllers\NorthWind.Sales.Backend.Controllers.csproj" />
     <ProjectReference Include="..\..\InterfaceAdapters\NorthWind.Sales.Backend.SmtpGateways\NorthWind.Sales.Backend.SmtpGateways.csproj" />
+    <ProjectReference Include="..\..\EnterpriseBusinessRules\NorthWind.Transactions.Entities\NorthWind.Transactions.Entities.csproj" />
+    <ProjectReference Include="..\NorthWind.UserServices\NorthWind.UserServices.csproj" />
+    <ProjectReference Include="..\..\ApplicationBusinessRules\NorthWind.Membership.Backend.Core\NorthWind.Membership.Backend.Core.csproj" />
+    <ProjectReference Include="..\NorthWind.Membership.Backend.AspNetIdentity\NorthWind.Membership.Backend.AspNetIdentity.csproj" />
   </ItemGroup>
 
 

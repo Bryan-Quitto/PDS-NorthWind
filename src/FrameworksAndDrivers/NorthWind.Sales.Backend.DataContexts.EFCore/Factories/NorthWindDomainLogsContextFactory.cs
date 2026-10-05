@@ -10,7 +10,10 @@ public class NorthWindDomainLogsContextFactory : IDesignTimeDbContextFactory<Nor
 {
     public NorthWindDomainLogsContext CreateDbContext(string[] args)
     {
-        var options = Microsoft.Extensions.Options.Options.Create(new DBOptions());
+        var options = Microsoft.Extensions.Options.Options.Create(new DBOptions
+        {
+            DomainLogsConnectionString = "Server=localhost;Database=NorthWindLogsDB;Trusted_Connection=True;TrustServerCertificate=True;"
+        });
         return new NorthWindDomainLogsContext(options);
     }
 }

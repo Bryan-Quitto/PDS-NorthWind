@@ -12,4 +12,5 @@ public interface IValidationRules<T, TProperty>
     IValidationRules<T, TProperty> LessThanOrEqualTo(TProperty valueToCompare, string errorMessage);
     IValidationRules<T, TProperty> Must(Func<TProperty, bool> predicate, string errorMessage);
     IValidationRules<T, TProperty> MustAsync(Func<TProperty, CancellationToken, Task<bool>> predicate, string errorMessage);
+    IValidationRules<T, TProperty> Equal(Func<T, TProperty> expression, string errorMessage);
 }
