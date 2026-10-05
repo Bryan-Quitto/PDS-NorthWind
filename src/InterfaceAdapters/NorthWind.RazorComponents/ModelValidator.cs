@@ -94,7 +94,7 @@ public class ModelValidator<T> : ComponentBase, IDisposable
         CurrentEditContext.NotifyValidationStateChanged();
     }
 
-    private static FieldIdentifier ResolveFieldIdentifier(object rootModel, string propertyPath)
+    public static FieldIdentifier ResolveFieldIdentifier(object rootModel, string propertyPath)
     {
         if (string.IsNullOrWhiteSpace(propertyPath))
         {

@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
+    <_RunExtraArguments>--urls "https://localhost:7276;http://localhost:5034"</_RunExtraArguments>
   </PropertyGroup>
 
   <ItemGroup>

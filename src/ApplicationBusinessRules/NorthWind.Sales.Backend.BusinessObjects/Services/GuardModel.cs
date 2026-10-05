@@ -13,7 +13,7 @@ public static class GuardModel
         var errors = await validatorHub.ValidateAsync(model, cancellationToken);
         if (errors.Count > 0)
         {
-            throw new NorthWind.Exceptions.Entities.Exceptions.ValidationException(errors);
+                throw new NorthWind.Exceptions.Entities.Exceptions.ValidationException(errors);
         }
     }
 }

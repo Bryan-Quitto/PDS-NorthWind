@@ -19,7 +19,7 @@
         }
         else
         {
-            <EditForm Model="@Model" OnValidSubmit="HandleValidSubmit">
+            <EditForm EditContext="@_editContext" OnValidSubmit="HandleValidSubmit">
                 <ModelValidator T="CreateOrderViewModel" />
 
                 <div class="row g-3 mb-4">
@@ -135,6 +135,8 @@
     [Inject]
     public ICreateOrderGateway OrderGateway { get; set; } = default!;
 
+    private EditContext _editContext = default!;
+    private ValidationMessageStore _serverMessageStore = default!;
     private Exception? _currentException;
     private int? _createdOrderId;
     private bool _isSubmitting;
@@ -145,6 +147,19 @@
         {
             Model.AddDetail();
         }
+
+        InitializeEditContext();
+    }
+
+    private void InitializeEditContext()
+    {
+        _editContext = new EditContext(Model);
+        _serverMessageStore = new ValidationMessageStore(_editContext);
+        _editContext.OnFieldChanged += (s, e) =>
+        {
+            _serverMessageStore.Clear(e.FieldIdentifier);
+            _editContext.NotifyValidationStateChanged();
+        };
     }
 
     private void AddDetail()
@@ -160,6 +175,8 @@
     private async Task HandleValidSubmit()
     {
         _currentException = null;
+        _serverMessageStore.Clear();
+        _editContext.NotifyValidationStateChanged();
         _isSubmitting = true;
 
         try
@@ -171,6 +188,25 @@
         catch (Exception ex)
         {
             _currentException = ex;
+
+            // Inyectar errores devueltos por el backend al ValidationMessageStore del formulario
+            if (ex.Data.Contains("Errors") && ex.Data["Errors"] is IEnumerable<ValidationError> validationErrors)
+            {
+                var errorsList = validationErrors.ToList();
+                if (errorsList.Count > 0)
+                {
+                    foreach (var error in errorsList)
+                    {
+                        var fieldIdentifier = ModelValidator<CreateOrderViewModel>.ResolveFieldIdentifier(Model, error.PropertyName);
+                        var fieldMessage = error.ErrorMessage.Contains("superan las existencias", StringComparison.OrdinalIgnoreCase)
+                            ? "Stock insuficiente"
+                            : error.ErrorMessage;
+
+                        _serverMessageStore.Add(fieldIdentifier, fieldMessage);
+                    }
+                    _editContext.NotifyValidationStateChanged();
+                }
+            }
         }
         finally
         {
@@ -184,5 +220,6 @@
         _currentException = null;
         Model.Reset();
         Model.AddDetail();
+        InitializeEditContext();
     }
 }
