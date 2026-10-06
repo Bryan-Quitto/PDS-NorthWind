@@ -1,5 +1,4 @@
 using NorthWind.Validation.Entities.Interfaces;
-using NorthWind.Validation.Entities.ValueObjects;
 
 namespace NorthWind.Validation.Entities.Abstractions;
 

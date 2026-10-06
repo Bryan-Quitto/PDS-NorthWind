@@ -1,10 +1,3 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using NorthWind.Sales.Backend.BusinessObjects.Interfaces.Ports;
-using NorthWind.Sales.Entities.Dtos;
-using NorthWind.Sales.Entities.ValueObjects;
-
 namespace NorthWind.Sales.Backend.Controllers;
 
 public static class CreateOrderController

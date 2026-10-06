@@ -1,5 +1,3 @@
-using NorthWind.DomainLogs.Entities.Interfaces;
-using NorthWind.DomainLogs.Entities.ValueObjects;
 using NorthWind.Sales.Backend.Repositories.Interfaces;
 
 namespace NorthWind.Sales.Backend.Repositories.Repositories;

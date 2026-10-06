@@ -1,5 +1,3 @@
-using NorthWind.Entities;
-using NorthWind.Events.Entities.Interfaces;
 using NorthWind.Sales.Backend.UseCases.Events;
 
 namespace NorthWind.Sales.Backend.UseCases.EventHandlers;

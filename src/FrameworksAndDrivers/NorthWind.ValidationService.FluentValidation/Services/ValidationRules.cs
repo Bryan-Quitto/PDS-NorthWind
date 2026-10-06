@@ -1,6 +1,3 @@
-using FluentValidation;
-using NorthWind.Validation.Entities.Interfaces;
-
 namespace NorthWind.ValidationService.FluentValidation.Services;
 
 public class ValidationRules<T, TProperty>(IRuleBuilder<T, TProperty> ruleBuilder)

@@ -1,7 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using NorthWind.DomainLogs.Entities.ValueObjects;
-
 namespace NorthWind.Sales.Backend.DataContexts.EFCore.Configurations;
 
 public class DomainLogConfiguration : IEntityTypeConfiguration<DomainLog>

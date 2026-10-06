@@ -1,7 +1,3 @@
-using System.Net;
-using System.Net.Mail;
-using Microsoft.Extensions.Options;
-using NorthWind.Entities;
 using NorthWind.Sales.Backend.SmtpGateways.Options;
 
 namespace NorthWind.Sales.Backend.SmtpGateways.Services;

@@ -1,6 +1,4 @@
 using System.Text.Json;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 
 namespace NorthWind.Exceptions.Entities.Extensions;
 

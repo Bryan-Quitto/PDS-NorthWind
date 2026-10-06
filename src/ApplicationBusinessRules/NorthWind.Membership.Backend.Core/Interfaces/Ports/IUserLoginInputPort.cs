@@ -1,5 +1,3 @@
-using NorthWind.Membership.Entities.Dtos;
-
 namespace NorthWind.Membership.Backend.Core.Interfaces.Ports;
 
 public interface IUserLoginInputPort

@@ -1,7 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using NorthWind.Sales.Backend.BusinessObjects.Entities;
-
 namespace NorthWind.Sales.Backend.DataContexts.EFCore.Configurations;
 
 public class OrderConfiguration : IEntityTypeConfiguration<Order>

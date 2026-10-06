@@ -1,5 +1,3 @@
-using NorthWind.Sales.Backend.BusinessObjects.Interfaces.Ports;
-
 namespace NorthWind.Sales.Backend.Presenters;
 
 public class CreateOrderPresenter : ICreateOrderOutputPort

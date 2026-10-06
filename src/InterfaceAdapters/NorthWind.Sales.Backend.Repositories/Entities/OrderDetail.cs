@@ -1,5 +1,3 @@
-using NorthWind.Sales.Backend.BusinessObjects.Entities;
-
 namespace NorthWind.Sales.Backend.Repositories.Entities;
 
 public class OrderDetail

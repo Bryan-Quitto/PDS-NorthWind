@@ -1,7 +1,5 @@
 using NorthWind.Membership.Backend.Core.Interfaces.Ports;
 using NorthWind.Membership.Backend.Core.Interfaces.Services;
-using NorthWind.Membership.Entities.Dtos;
-using NorthWind.Result.Entities;
 using NorthWind.Validation.Entities.Interfaces;
 
 namespace NorthWind.Membership.Backend.Core.UseCases;

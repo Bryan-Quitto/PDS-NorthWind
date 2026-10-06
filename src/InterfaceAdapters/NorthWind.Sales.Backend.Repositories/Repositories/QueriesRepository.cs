@@ -1,5 +1,3 @@
-using NorthWind.Sales.Backend.BusinessObjects.Interfaces.Repositories;
-using NorthWind.Sales.Backend.BusinessObjects.ValueObjects;
 using NorthWind.Sales.Backend.Repositories.Interfaces;
 
 namespace NorthWind.Sales.Backend.Repositories.Repositories;

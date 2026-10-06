@@ -1,5 +1,3 @@
-using NorthWind.Sales.Entities.Dtos;
-
 namespace NorthWind.Sales.Backend.BusinessObjects.Interfaces.Ports;
 
 public interface ICreateOrderInputPort

@@ -1,6 +1,3 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using NorthWind.DomainLogs.Entities.Interfaces;
 using NorthWind.DomainLogs.Entities.Services;
 using NorthWind.Entities;

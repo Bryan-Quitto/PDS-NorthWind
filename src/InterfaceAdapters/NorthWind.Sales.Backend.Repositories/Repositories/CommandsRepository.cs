@@ -1,6 +1,3 @@
-using NorthWind.Sales.Backend.BusinessObjects.Aggregates;
-using NorthWind.Sales.Backend.BusinessObjects.Entities;
-using NorthWind.Sales.Backend.BusinessObjects.Interfaces.Repositories;
 using NorthWind.Sales.Backend.Repositories.Interfaces;
 
 namespace NorthWind.Sales.Backend.Repositories.Repositories;

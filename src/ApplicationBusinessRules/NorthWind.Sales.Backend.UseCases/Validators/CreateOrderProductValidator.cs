@@ -1,8 +1,4 @@
-using NorthWind.Sales.Backend.BusinessObjects.Interfaces.Repositories;
-using NorthWind.Sales.Entities.Dtos;
-using NorthWind.Validation.Entities.Abstractions;
 using NorthWind.Validation.Entities.Enums;
-using NorthWind.Validation.Entities.Interfaces;
 using NorthWind.Validation.Entities.ValueObjects;
 
 namespace NorthWind.Sales.Backend.UseCases.Validators;

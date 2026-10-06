@@ -1,10 +1,10 @@
-using System.Security.Claims;
-using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using NorthWind.Membership.Backend.Core.Dtos;
 using NorthWind.Membership.Backend.Core.Options;
+using System.Security.Claims;
+using System.Text;
 
 namespace NorthWind.Membership.Backend.Core.Services;
 

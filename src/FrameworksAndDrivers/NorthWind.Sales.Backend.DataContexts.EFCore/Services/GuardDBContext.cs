@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using NorthWind.Exceptions.Entities.Exceptions;
 
 namespace NorthWind.Sales.Backend.DataContexts.EFCore.Services;

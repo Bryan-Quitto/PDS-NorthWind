@@ -1,6 +1,4 @@
 using NorthWind.Membership.Backend.Core.Dtos;
-using NorthWind.Membership.Entities.Dtos;
-using NorthWind.Result.Entities;
 
 namespace NorthWind.Membership.Backend.Core.Interfaces.Services;
 

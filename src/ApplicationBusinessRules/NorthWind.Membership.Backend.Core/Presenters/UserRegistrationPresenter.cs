@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NorthWind.Membership.Backend.Core.Interfaces.Ports;
-using NorthWind.Result.Entities;
 
 namespace NorthWind.Membership.Backend.Core.Presenters;
 

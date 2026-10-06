@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using Microsoft.Extensions.Options;
 using NorthWind.Membership.Backend.AspNetIdentity.DataContexts;
 using NorthWind.Membership.Backend.AspNetIdentity.Options;
 

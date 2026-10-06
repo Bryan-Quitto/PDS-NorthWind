@@ -1,6 +1,3 @@
-using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using NorthWind.Exceptions.Entities.Extensions;
 
 namespace NorthWind.Exceptions.Entities.Handlers;

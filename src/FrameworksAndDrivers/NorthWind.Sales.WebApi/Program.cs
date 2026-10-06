@@ -1,13 +1,8 @@
-using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using NorthWind.Exceptions.Entities.Handlers;
 using NorthWind.Membership.Backend.Core.Options;
-using NorthWind.Sales.Backend.IoC;
+using System.Text;
 
 // Cargar variables de entorno desde archivo .env (si existe)
 DotNetEnv.Env.TraversePath().Load();

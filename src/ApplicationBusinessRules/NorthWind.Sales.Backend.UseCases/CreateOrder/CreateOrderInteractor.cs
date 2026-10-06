@@ -1,16 +1,6 @@
-using NorthWind.DomainLogs.Entities.Interfaces;
-using NorthWind.DomainLogs.Entities.ValueObjects;
-using NorthWind.Entities;
-using NorthWind.Events.Entities.Interfaces;
-using NorthWind.Sales.Backend.BusinessObjects.Aggregates;
-using NorthWind.Sales.Backend.BusinessObjects.Interfaces.Ports;
-using NorthWind.Sales.Backend.BusinessObjects.Interfaces.Repositories;
-using NorthWind.Sales.Backend.BusinessObjects.Services;
 using NorthWind.Sales.Backend.BusinessObjects.Specifications;
 using NorthWind.Sales.Backend.UseCases.Events;
-using NorthWind.Sales.Entities.Dtos;
 using NorthWind.Transactions.Entities.Interfaces;
-using NorthWind.Validation.Entities.Interfaces;
 
 namespace NorthWind.Sales.Backend.UseCases.CreateOrder;
 

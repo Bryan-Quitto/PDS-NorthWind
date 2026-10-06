@@ -1,6 +1,5 @@
-using System.Linq.Expressions;
-using NorthWind.Entities;
 using NorthWind.Sales.Backend.BusinessObjects.Aggregates;
+using System.Linq.Expressions;
 
 namespace NorthWind.Sales.Backend.BusinessObjects.Specifications;
 

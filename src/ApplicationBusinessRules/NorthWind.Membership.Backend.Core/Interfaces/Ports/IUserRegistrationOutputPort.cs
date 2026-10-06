@@ -1,5 +1,3 @@
-using NorthWind.Result.Entities;
-
 namespace NorthWind.Membership.Backend.Core.Interfaces.Ports;
 
 public interface IUserRegistrationOutputPort

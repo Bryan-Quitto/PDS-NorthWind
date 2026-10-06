@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using NorthWind.Membership.Backend.Core.Interfaces.Ports;
 using NorthWind.Membership.Backend.Core.Presenters;
 using NorthWind.Membership.Entities.Constants;
-using NorthWind.Membership.Entities.Dtos;
 
 namespace NorthWind.Membership.Backend.Core.Controllers;
 
