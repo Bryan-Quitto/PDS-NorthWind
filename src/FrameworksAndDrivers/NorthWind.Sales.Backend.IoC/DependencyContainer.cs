@@ -23,6 +23,9 @@ using NorthWind.Validation.Entities.Interfaces;
 using NorthWind.Validation.Entities.Services;
 using NorthWind.ValidationService.FluentValidation.Services;
 
+using NorthWind.Sales.Backend.UseCases.SearchCustomers;
+using NorthWind.Sales.Backend.UseCases.SearchProducts;
+
 namespace NorthWind.Sales.Backend.IoC;
 
 public static class DependencyContainer
@@ -73,10 +76,20 @@ public static class DependencyContainer
         services.AddScoped<IDomainEventHandler<SpecialOrderCreatedEvent>, SendEMailWhenSpecialOrderCreatedEventHandler>();
         services.AddScoped(typeof(IDomainEventHub<>), typeof(DomainEventHub<>));
 
-        // 7. Puertos, Interactor y Presentador
+        // 7. Puertos, Interactor y Presentador - CreateOrder
         services.AddScoped<CreateOrderPresenter>();
         services.AddScoped<ICreateOrderOutputPort>(sp => sp.GetRequiredService<CreateOrderPresenter>());
         services.AddScoped<ICreateOrderInputPort, CreateOrderInteractor>();
+
+        // 8. Puertos, Interactor y Presentador - SearchCustomers
+        services.AddScoped<SearchCustomersPresenter>();
+        services.AddScoped<ISearchCustomersOutputPort>(sp => sp.GetRequiredService<SearchCustomersPresenter>());
+        services.AddScoped<ISearchCustomersInputPort, SearchCustomersInteractor>();
+
+        // 9. Puertos, Interactor y Presentador - SearchProducts
+        services.AddScoped<SearchProductsPresenter>();
+        services.AddScoped<ISearchProductsOutputPort>(sp => sp.GetRequiredService<SearchProductsPresenter>());
+        services.AddScoped<ISearchProductsInputPort, SearchProductsInteractor>();
 
         return services;
     }
@@ -85,6 +98,8 @@ public static class DependencyContainer
     {
         NorthWind.Membership.Backend.Core.DependencyInjection.MembershipCoreServiceCollectionExtensions.MapMembershipEndpoints(app);
         app.UseCreateOrderController();
+        app.UseSearchCustomersController();
+        app.UseSearchProductsController();
         return app;
     }
 }

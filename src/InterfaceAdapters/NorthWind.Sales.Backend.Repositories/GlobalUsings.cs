@@ -4,6 +4,7 @@ global using NorthWind.Sales.Backend.BusinessObjects.Aggregates;
 global using NorthWind.Sales.Backend.BusinessObjects.Entities;
 global using NorthWind.Sales.Backend.BusinessObjects.Interfaces.Repositories;
 global using NorthWind.Sales.Backend.BusinessObjects.ValueObjects;
+global using NorthWind.Sales.Entities.Dtos;
 global using System.Collections.Generic;
 global using System.Linq;
 global using System.Threading;
