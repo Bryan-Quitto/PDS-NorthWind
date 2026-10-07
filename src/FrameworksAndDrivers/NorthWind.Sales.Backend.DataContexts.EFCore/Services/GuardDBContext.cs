@@ -10,6 +10,11 @@ public static class GuardDBContext
         {
             await context.SaveChangesAsync(cancellationToken);
         }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            var entries = ex.Entries.Select(e => e.Entity.GetType().Name).ToList();
+            throw new ConcurrencyException("A concurrency conflict occurred while saving changes to the database.", ex, entries);
+        }
         catch (DbUpdateException ex)
         {
             var entries = ex.Entries.Select(e => e.Entity.GetType().Name).ToList();

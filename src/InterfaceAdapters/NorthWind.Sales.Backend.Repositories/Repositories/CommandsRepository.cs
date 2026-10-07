@@ -21,4 +21,36 @@ public class CommandsRepository(INorthWindSalesCommandsDataContext context) : IC
         // 3. Agregar los detalles vinculados
         await context.AddOrderDetailsAsync(details, cancellationToken);
     }
+
+    public async Task<IReadOnlyList<TrackedProduct>> GetProductsByIdsAsync(
+        IEnumerable<int> ids,
+        CancellationToken cancellationToken = default)
+    {
+        var products = await context.GetProductsByIdsAsync(ids, cancellationToken);
+
+        var trackedProducts = products.Select(p => new TrackedProduct
+        {
+            Id = p.Id,
+            Name = p.Name,
+            UnitPrice = p.UnitPrice,
+            UnitsInStock = p.UnitsInStock,
+            RowVersion = p.RowVersion
+        }).ToList();
+
+        return trackedProducts;
+    }
+
+    public void UpdateProducts(IEnumerable<TrackedProduct> products)
+    {
+        var updatedEntities = products.Select(tp => new Entities.Product
+        {
+            Id = tp.Id,
+            Name = tp.Name,
+            UnitPrice = tp.UnitPrice,
+            UnitsInStock = tp.UnitsInStock,
+            RowVersion = tp.RowVersion
+        }).ToList();
+
+        context.UpdateProducts(updatedEntities);
+    }
 }

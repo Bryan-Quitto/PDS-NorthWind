@@ -35,10 +35,44 @@ public class CreateOrderInteractor(
         domainTransaction.BeginTransaction();
         try
         {
-            // 6. Persistir a través del repositorio de comandos
+            // 6. Obtener las entidades de productos reales a rastrear por el contexto de comandos
+            var productIds = orderAggregate.OrderDetails.Select(d => d.ProductId).Distinct().ToList();
+            var trackedProducts = await commandsRepository.GetProductsByIdsAsync(productIds, cancellationToken);
+            var productMap = trackedProducts.ToDictionary(p => p.Id);
+
+            // 7. Verificar stock suficiente y descontar unidades en inventario
+            var consolidatedQuantities = orderAggregate.OrderDetails
+                .GroupBy(d => d.ProductId)
+                .ToDictionary(g => g.Key, g => g.Sum(d => d.Quantity));
+
+            foreach (var (productId, requestedQuantity) in consolidatedQuantities)
+            {
+                if (!productMap.TryGetValue(productId, out var trackedProduct))
+                {
+                    throw new NorthWind.Exceptions.Entities.Exceptions.ValidationException(
+                        "OrderDetails",
+                        $"El producto con ID {productId} no existe en el catálogo."
+                    );
+                }
+
+                if (trackedProduct.UnitsInStock < requestedQuantity)
+                {
+                    throw new NorthWind.Exceptions.Entities.Exceptions.ValidationException(
+                        "OrderDetails",
+                        $"Stock insuficiente para el producto {trackedProduct.Name} (ID: {productId}). Existencias: {trackedProduct.UnitsInStock}, Solicitadas: {requestedQuantity}."
+                    );
+                }
+
+                trackedProduct.UnitsInStock = (short)(trackedProduct.UnitsInStock - requestedQuantity);
+            }
+
+            // 8. Actualizar productos en el repositorio de comandos
+            commandsRepository.UpdateProducts(trackedProducts);
+
+            // 9. Persistir a través del repositorio de comandos
             await commandsRepository.CreateOrderAsync(orderAggregate, cancellationToken);
 
-            // 7. Commit atómico vía Unit of Work
+            // 10. Commit atómico vía Unit of Work (valida RowVersion con concurrencia optimista)
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
             // 8. Auditoría final de dominio

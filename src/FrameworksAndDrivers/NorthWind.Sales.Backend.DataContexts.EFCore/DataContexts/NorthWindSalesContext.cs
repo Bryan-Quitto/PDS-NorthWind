@@ -37,6 +37,16 @@ public class NorthWindSalesContext(IOptions<DBOptions> dbOptions) : DbContext,
         base.OnModelCreating(modelBuilder);
     }
 
+    public async Task<IReadOnlyList<NorthWind.Sales.Backend.Repositories.Entities.Product>> GetProductsByIdsAsync(
+        IEnumerable<int> ids,
+        CancellationToken cancellationToken = default)
+    {
+        var idList = ids.ToList();
+        return await Products
+            .Where(p => idList.Contains(p.Id))
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task AddOrderAsync(Order order, CancellationToken cancellationToken = default)
     {
         await Orders.AddAsync(order, cancellationToken);
@@ -45,6 +55,11 @@ public class NorthWindSalesContext(IOptions<DBOptions> dbOptions) : DbContext,
     public async Task AddOrderDetailsAsync(IEnumerable<OrderDetail> orderDetails, CancellationToken cancellationToken = default)
     {
         await OrderDetails.AddRangeAsync(orderDetails, cancellationToken);
+    }
+
+    public void UpdateProducts(IEnumerable<NorthWind.Sales.Backend.Repositories.Entities.Product> products)
+    {
+        Products.UpdateRange(products);
     }
 
     public new async Task SaveChangesAsync(CancellationToken cancellationToken = default)
