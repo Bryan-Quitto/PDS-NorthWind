@@ -18,6 +18,8 @@ public class NorthWindSalesContext(IOptions<DBOptions> dbOptions) : DbContext,
 
     IQueryable<Customer> INorthWindSalesQueriesDataContext.Customers => Customers.AsNoTracking();
     IQueryable<Product> INorthWindSalesQueriesDataContext.Products => Products.AsNoTracking();
+    IQueryable<Order> INorthWindSalesQueriesDataContext.Orders => Orders.AsNoTracking();
+    IQueryable<OrderDetail> INorthWindSalesQueriesDataContext.OrderDetails => OrderDetails.AsNoTracking();
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

@@ -47,4 +47,16 @@ public static class ViewMessages
     public const string NoRecordsFound = "No se encontraron resultados.";
     public const string LoadingData = "Buscando información...";
     public const string StockLabel = "Stock";
+    public const string InvoiceSearchTitle = "Búsqueda y Reconstrucción de Facturas";
+    public const string InvoiceSearchPlaceholder = "Buscar por No. Factura o Nombre de Cliente...";
+    public const string OrderIdColumnLabel = "No. Factura";
+    public const string OrderDateColumnLabel = "Fecha de Emisión";
+    public const string ItemsCountColumnLabel = "Ítems";
+    public const string ViewInvoiceButton = "Ver Factura";
+    public const string ExportPdfButton = "Descargar Factura (PDF)";
+    public const string ExportingPdfButton = "Generando PDF...";
+    public const string BackToSearchButton = "Volver a la Búsqueda";
+    public const string InvoiceDetailsHeader = "Detalle de Factura Electrónica";
+    public const string InvoiceNotFound = "No se encontró la factura solicitada.";
+    public const string ReconstructedInvoiceNotice = "Documento de Solo Lectura generado desde el historial de ventas.";
 }

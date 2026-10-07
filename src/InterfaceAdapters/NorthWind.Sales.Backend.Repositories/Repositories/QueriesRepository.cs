@@ -99,5 +99,119 @@ public class QueriesRepository(INorthWindSalesQueriesDataContext context) : IQue
         var result = new PaginatedResultDto<ProductDto>(items, totalCount, normalizedPageNumber, normalizedPageSize);
         return Task.FromResult(result);
     }
+
+    public Task<OrderInvoiceDto?> GetOrderInvoiceByIdAsync(int orderId, CancellationToken cancellationToken = default)
+    {
+        var order = context.Orders.FirstOrDefault(o => o.Id == orderId);
+        if (order == null)
+        {
+            return Task.FromResult<OrderInvoiceDto?>(null);
+        }
+
+        var customer = context.Customers.FirstOrDefault(c => c.Id == order.CustomerId);
+        var customerName = customer?.Name ?? order.CustomerId;
+        var customerIdentification = customer?.Identification ?? string.Empty;
+
+        var rawDetails = context.OrderDetails.Where(od => od.OrderId == orderId).ToList();
+        var productIds = rawDetails.Select(od => od.ProductId).Distinct().ToList();
+        var productsDict = context.Products
+            .Where(p => productIds.Contains(p.Id))
+            .ToDictionary(p => p.Id, p => p.Name);
+
+        var details = rawDetails.Select(d => new OrderInvoiceDetailDto(
+            d.ProductId,
+            productsDict.TryGetValue(d.ProductId, out var name) ? name : $"Producto #{d.ProductId}",
+            d.UnitPrice,
+            d.Quantity,
+            d.UnitPrice * d.Quantity
+        )).ToList();
+
+        var invoiceDto = new OrderInvoiceDto(
+            order.Id,
+            order.OrderDate,
+            order.CustomerId,
+            customerName,
+            customerIdentification,
+            order.ShipAddress,
+            order.ShipCity,
+            order.ShipCountry,
+            order.ShipPostalCode,
+            order.Subtotal,
+            order.Tax,
+            order.Total,
+            details
+        );
+
+        return Task.FromResult<OrderInvoiceDto?>(invoiceDto);
+    }
+
+    public Task<PaginatedResultDto<OrderSummaryDto>> SearchOrdersAsync(
+        string? searchTerm,
+        int pageNumber,
+        int pageSize,
+        CancellationToken cancellationToken = default)
+    {
+        var ordersQuery = context.Orders;
+        var customers = context.Customers;
+
+        var joinedQuery = ordersQuery.Join(
+            customers,
+            o => o.CustomerId,
+            c => c.Id,
+            (o, c) => new { Order = o, Customer = c }
+        );
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            var trimmedTerm = searchTerm.Trim();
+            if (int.TryParse(trimmedTerm, out var parsedOrderId))
+            {
+                joinedQuery = joinedQuery.Where(x => x.Order.Id == parsedOrderId || x.Customer.Name.Contains(trimmedTerm));
+            }
+            else
+            {
+                joinedQuery = joinedQuery.Where(x => x.Customer.Name.Contains(trimmedTerm) || x.Order.CustomerId.Contains(trimmedTerm));
+            }
+        }
+
+        var totalCount = joinedQuery.Count();
+
+        var normalizedPageNumber = pageNumber < 1 ? 1 : pageNumber;
+        var normalizedPageSize = pageSize < 1 ? 10 : pageSize;
+
+        var pagedList = joinedQuery
+            .OrderByDescending(x => x.Order.OrderDate)
+            .Skip((normalizedPageNumber - 1) * normalizedPageSize)
+            .Take(normalizedPageSize)
+            .Select(x => new
+            {
+                x.Order.Id,
+                x.Order.OrderDate,
+                x.Order.CustomerId,
+                CustomerName = x.Customer.Name,
+                x.Order.Total
+            })
+            .ToList();
+
+        var orderIds = pagedList.Select(x => x.Id).ToList();
+        var countsByOrderId = context.OrderDetails
+            .Where(od => orderIds.Contains(od.OrderId))
+            .GroupBy(od => od.OrderId)
+            .Select(g => new { OrderId = g.Key, Count = g.Count() })
+            .ToDictionary(g => g.OrderId, g => g.Count);
+
+        var summaries = pagedList.Select(x => new OrderSummaryDto(
+            x.Id,
+            x.OrderDate,
+            x.CustomerId,
+            x.CustomerName,
+            countsByOrderId.TryGetValue(x.Id, out var count) ? count : 0,
+            x.Total
+        )).ToList();
+
+        var result = new PaginatedResultDto<OrderSummaryDto>(summaries, totalCount, normalizedPageNumber, normalizedPageSize);
+        return Task.FromResult(result);
+    }
 }
+
 

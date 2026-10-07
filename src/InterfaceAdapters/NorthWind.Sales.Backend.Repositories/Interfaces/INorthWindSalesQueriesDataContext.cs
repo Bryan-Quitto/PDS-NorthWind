@@ -6,4 +6,6 @@ public interface INorthWindSalesQueriesDataContext
 {
     IQueryable<Customer> Customers { get; }
     IQueryable<Product> Products { get; }
+    IQueryable<Order> Orders { get; }
+    IQueryable<NorthWind.Sales.Backend.Repositories.Entities.OrderDetail> OrderDetails { get; }
 }

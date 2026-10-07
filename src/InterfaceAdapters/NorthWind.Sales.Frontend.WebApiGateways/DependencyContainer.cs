@@ -9,9 +9,11 @@ public static class DependencyContainer
     {
         var createOrderBuilder = services.AddHttpClient<ICreateOrderGateway, CreateOrderGateway>(configureClient);
         var searchBuilder = services.AddHttpClient<ISearchGateway, SearchGateway>(configureClient);
+        var invoiceBuilder = services.AddHttpClient<IOrderInvoiceGateway, OrderInvoiceGateway>(configureClient);
 
         configureBuilder?.Invoke(createOrderBuilder);
         configureBuilder?.Invoke(searchBuilder);
+        configureBuilder?.Invoke(invoiceBuilder);
 
         return services;
     }

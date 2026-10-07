@@ -85,6 +85,7 @@ builder.Services.AddCors(options =>
 
 // 5. Servicios de Clean Architecture de NorthWind Sales
 builder.Services.AddNorthWindSalesServices(builder.Configuration);
+builder.Services.AddSingleton<NorthWind.Sales.Backend.BusinessObjects.Interfaces.Services.IInvoicePdfGenerator, NorthWind.Sales.WebApi.Services.QuestPdfInvoiceGenerator>();
 
 var app = builder.Build();
 

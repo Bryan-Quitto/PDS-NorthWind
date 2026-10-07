@@ -25,6 +25,8 @@ using NorthWind.ValidationService.FluentValidation.Services;
 
 using NorthWind.Sales.Backend.UseCases.SearchCustomers;
 using NorthWind.Sales.Backend.UseCases.SearchProducts;
+using NorthWind.Sales.Backend.UseCases.SearchOrders;
+using NorthWind.Sales.Backend.UseCases.GetOrderInvoice;
 
 namespace NorthWind.Sales.Backend.IoC;
 
@@ -91,6 +93,16 @@ public static class DependencyContainer
         services.AddScoped<ISearchProductsOutputPort>(sp => sp.GetRequiredService<SearchProductsPresenter>());
         services.AddScoped<ISearchProductsInputPort, SearchProductsInteractor>();
 
+        // 10. Puertos, Interactor y Presentador - SearchOrders
+        services.AddScoped<SearchOrdersPresenter>();
+        services.AddScoped<ISearchOrdersOutputPort>(sp => sp.GetRequiredService<SearchOrdersPresenter>());
+        services.AddScoped<ISearchOrdersInputPort, SearchOrdersInteractor>();
+
+        // 11. Puertos, Interactor y Presentador - GetOrderInvoice
+        services.AddScoped<GetOrderInvoicePresenter>();
+        services.AddScoped<IGetOrderInvoiceOutputPort>(sp => sp.GetRequiredService<GetOrderInvoicePresenter>());
+        services.AddScoped<IGetOrderInvoiceInputPort, GetOrderInvoiceInteractor>();
+
         return services;
     }
 
@@ -100,6 +112,7 @@ public static class DependencyContainer
         app.UseCreateOrderController();
         app.UseSearchCustomersController();
         app.UseSearchProductsController();
+        app.UseOrderInvoicesController();
         return app;
     }
 }
