@@ -1,0 +1,210 @@
+@if (IsOpen)
+{
+    <div class="modal fade show d-block" tabindex="-1" role="dialog" style="background-color: rgba(0, 0, 0, 0.5);">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content shadow-lg">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-box-seam me-2"></i>@ViewMessages.ProductSearchTitle
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" aria-label="Close" @onclick="CloseAsync"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group mb-3">
+                        <input type="text"
+                               class="form-control"
+                               placeholder="@ViewMessages.SearchPlaceholder"
+                               value="@_searchTerm"
+                               @oninput="HandleSearchInput"
+                               @onkeydown="HandleKeyDown" />
+                        <button class="btn btn-success" type="button" @onclick="() => SearchAsync(1)" disabled="@_isLoading">
+                            @ViewMessages.SearchButton
+                        </button>
+                        <button class="btn btn-outline-secondary" type="button" @onclick="ClearSearchAsync" disabled="@_isLoading">
+                            @ViewMessages.ClearButton
+                        </button>
+                    </div>
+
+                    @if (_isLoading)
+                    {
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-success" role="status">
+                                <span class="visually-hidden">@ViewMessages.LoadingData</span>
+                            </div>
+                            <p class="mt-2 text-muted small">@ViewMessages.LoadingData</p>
+                        </div>
+                    }
+                    else if (_products.Count == 0)
+                    {
+                        <div class="alert alert-info text-center my-3">
+                            @ViewMessages.NoRecordsFound
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>@ViewMessages.ProductNameLabel</th>
+                                        <th class="text-end">@ViewMessages.UnitPriceLabel</th>
+                                        <th class="text-center">@ViewMessages.StockLabel</th>
+                                        <th class="text-center" style="width: 120px;">@ViewMessages.ActionsLabel</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var product in _products)
+                                    {
+                                        <tr>
+                                            <td class="fw-bold">@product.Id</td>
+                                            <td>@product.Name</td>
+                                            <td class="text-end font-monospace">@product.UnitPrice.ToString("C2")</td>
+                                            <td class="text-center">
+                                                <span class="badge @(product.UnitsInStock > 0 ? "bg-success" : "bg-danger")">
+                                                    @product.UnitsInStock
+                                                </span>
+                                            </td>
+                                            <td class="text-center">
+                                                <button class="btn btn-sm btn-success px-3"
+                                                        type="button"
+                                                        disabled="@(product.UnitsInStock <= 0)"
+                                                        @onclick="() => SelectProductAsync(product)">
+                                                    @ViewMessages.SelectButton
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+                            <small class="text-muted">
+                                @ViewMessages.TotalRecordsLabel <strong>@_totalCount</strong> | @ViewMessages.PageLabel @_currentPage @ViewMessages.OfLabel @_totalPages
+                            </small>
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-secondary"
+                                        type="button"
+                                        disabled="@(!HasPreviousPage || _isLoading)"
+                                        @onclick="PreviousPageAsync">
+                                    &laquo; @ViewMessages.PreviousButton
+                                </button>
+                                <button class="btn btn-outline-secondary"
+                                        type="button"
+                                        disabled="@(!HasNextPage || _isLoading)"
+                                        @onclick="NextPageAsync">
+                                    @ViewMessages.NextButton &raquo;
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseAsync">
+                        @ViewMessages.CloseButton
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public bool IsOpen { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IsOpenChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<ProductDto> OnProductSelected { get; set; }
+
+    [Inject]
+    public ISearchGateway SearchGateway { get; set; } = default!;
+
+    private string _searchTerm = string.Empty;
+    private int _currentPage = 1;
+    private const int PageSize = 10;
+    private int _totalCount = 0;
+    private int _totalPages = 1;
+    private bool _isLoading = false;
+    private IReadOnlyList<ProductDto> _products = [];
+
+    private bool HasPreviousPage => _currentPage > 1;
+    private bool HasNextPage => _currentPage < _totalPages;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (IsOpen && _products.Count == 0 && !_isLoading)
+        {
+            await SearchAsync(1);
+        }
+    }
+
+    private void HandleSearchInput(ChangeEventArgs e)
+    {
+        _searchTerm = e.Value?.ToString() ?? string.Empty;
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await SearchAsync(1);
+        }
+    }
+
+    public async Task SearchAsync(int pageNumber)
+    {
+        _isLoading = true;
+        _currentPage = pageNumber;
+
+        try
+        {
+            var result = await SearchGateway.SearchProductsAsync(_searchTerm, _currentPage, PageSize);
+            _products = result.Items;
+            _totalCount = result.TotalCount;
+            _totalPages = (int)Math.Ceiling((double)_totalCount / PageSize);
+            if (_totalPages < 1) _totalPages = 1;
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private async Task ClearSearchAsync()
+    {
+        _searchTerm = string.Empty;
+        await SearchAsync(1);
+    }
+
+    private async Task PreviousPageAsync()
+    {
+        if (HasPreviousPage)
+        {
+            await SearchAsync(_currentPage - 1);
+        }
+    }
+
+    private async Task NextPageAsync()
+    {
+        if (HasNextPage)
+        {
+            await SearchAsync(_currentPage + 1);
+        }
+    }
+
+    private async Task SelectProductAsync(ProductDto product)
+    {
+        await OnProductSelected.InvokeAsync(product);
+        await CloseAsync();
+    }
+
+    private async Task CloseAsync()
+    {
+        IsOpen = false;
+        await IsOpenChanged.InvokeAsync(false);
+    }
+}

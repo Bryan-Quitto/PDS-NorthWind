@@ -2,10 +2,17 @@ namespace NorthWind.Sales.Frontend.WebApiGateways;
 
 public static class DependencyContainer
 {
-    public static IHttpClientBuilder AddNorthWindSalesGateway(
+    public static IServiceCollection AddNorthWindSalesGateways(
         this IServiceCollection services,
-        Action<HttpClient> configureClient)
+        Action<HttpClient> configureClient,
+        Action<IHttpClientBuilder>? configureBuilder = null)
     {
-        return services.AddHttpClient<ICreateOrderGateway, CreateOrderGateway>(configureClient);
+        var createOrderBuilder = services.AddHttpClient<ICreateOrderGateway, CreateOrderGateway>(configureClient);
+        var searchBuilder = services.AddHttpClient<ISearchGateway, SearchGateway>(configureClient);
+
+        configureBuilder?.Invoke(createOrderBuilder);
+        configureBuilder?.Invoke(searchBuilder);
+
+        return services;
     }
 }

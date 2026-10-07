@@ -13,12 +13,14 @@ public static class DependencyContainer
 
         services.AddTransient<ExceptionDelegatingHandler>();
 
-        services.AddNorthWindSalesGateway(client =>
+        services.AddNorthWindSalesGateways(client =>
         {
             client.BaseAddress = new Uri(webApiAddress);
-        })
-        .AddHttpMessageHandler<NorthWind.Membership.Frontend.RazorViews.Services.MembershipBearerTokenHandler>()
-        .AddHttpMessageHandler<ExceptionDelegatingHandler>();
+        }, builder =>
+        {
+            builder.AddHttpMessageHandler<NorthWind.Membership.Frontend.RazorViews.Services.MembershipBearerTokenHandler>()
+                   .AddHttpMessageHandler<ExceptionDelegatingHandler>();
+        });
 
         services.AddTransient(typeof(IValidationService<>), typeof(ValidationService<>));
         services.AddTransient<IModelValidator<CreateOrderDetailViewModel>, CreateOrderDetailViewModelValidator>();
