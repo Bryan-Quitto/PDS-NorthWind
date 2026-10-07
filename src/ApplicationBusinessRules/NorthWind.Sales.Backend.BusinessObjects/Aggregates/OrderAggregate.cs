@@ -10,6 +10,8 @@ public class OrderAggregate : Order
 
     public IReadOnlyCollection<OrderDetail> OrderDetails => orderDetailsField.AsReadOnly();
 
+    public const decimal TaxRate = 0.15m;
+
     public void AddDetail(int productId, decimal unitPrice, short quantity)
     {
         var existingIndex = orderDetailsField.FindIndex(d => d.ProductId == productId);
@@ -26,6 +28,15 @@ public class OrderAggregate : Order
         {
             orderDetailsField.Add(new OrderDetail(productId, unitPrice, quantity));
         }
+
+        RecalculateTotals();
+    }
+
+    private void RecalculateTotals()
+    {
+        Subtotal = orderDetailsField.Sum(d => d.UnitPrice * d.Quantity);
+        Tax = Math.Round(Subtotal * TaxRate, 2, MidpointRounding.AwayFromZero);
+        Total = Subtotal + Tax;
     }
 
     public static OrderAggregate From(CreateOrderDto orderDto)

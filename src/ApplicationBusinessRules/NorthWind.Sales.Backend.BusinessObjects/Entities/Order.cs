@@ -14,4 +14,7 @@ public class Order
     public DiscountType DiscountType { get; set; } = DiscountType.Percentage;
     public double Discount { get; set; } = 10;
     public DateTime OrderDate { get; set; } = DateTime.UtcNow;
+    public decimal Subtotal { get; set; }
+    public decimal Tax { get; set; }
+    public decimal Total { get; set; }
 }

@@ -59,4 +59,10 @@
   <data name="QuantityGreaterThanZero" xml:space="preserve">
     <value>La cantidad debe ser mayor a cero.</value>
   </data>
+  <data name="CustomerIdentificationRequired" xml:space="preserve">
+    <value>La identificación del cliente es requerida.</value>
+  </data>
+  <data name="CustomerIdentificationInvalid" xml:space="preserve">
+    <value>La cédula ingresada no es válida para Ecuador.</value>
+  </data>
 </root>

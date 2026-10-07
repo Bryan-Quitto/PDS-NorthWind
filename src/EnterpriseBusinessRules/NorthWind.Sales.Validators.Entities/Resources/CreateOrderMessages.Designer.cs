@@ -39,4 +39,6 @@ public class CreateOrderMessages
     public static string ProductIdGreaterThanZero => ResourceManager.GetString("ProductIdGreaterThanZero", resourceCulture) ?? "El identificador del producto debe ser mayor a cero.";
     public static string UnitPriceGreaterThanZero => ResourceManager.GetString("UnitPriceGreaterThanZero", resourceCulture) ?? "El precio unitario debe ser mayor a cero.";
     public static string QuantityGreaterThanZero => ResourceManager.GetString("QuantityGreaterThanZero", resourceCulture) ?? "La cantidad debe ser mayor a cero.";
+    public static string CustomerIdentificationRequired => ResourceManager.GetString("CustomerIdentificationRequired", resourceCulture) ?? "La identificación del cliente es requerida.";
+    public static string CustomerIdentificationInvalid => ResourceManager.GetString("CustomerIdentificationInvalid", resourceCulture) ?? "La cédula ingresada no es válida para Ecuador.";
 }

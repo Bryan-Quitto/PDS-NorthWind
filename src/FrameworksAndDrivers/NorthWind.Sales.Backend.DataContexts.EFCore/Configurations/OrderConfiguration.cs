@@ -14,5 +14,8 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.Property(o => o.ShippingType).IsRequired();
         builder.Property(o => o.DiscountType).IsRequired();
         builder.Property(o => o.Discount).HasPrecision(8, 2);
+        builder.Property(o => o.Subtotal).HasPrecision(18, 2);
+        builder.Property(o => o.Tax).HasPrecision(18, 2);
+        builder.Property(o => o.Total).HasPrecision(18, 2);
     }
 }

@@ -74,6 +74,18 @@ namespace NorthWind.Sales.Backend.DataContexts.EFCore.Migrations.NorthWindSales
                     b.Property<int>("ShippingType")
                         .HasColumnType("int");
 
+                    b.Property<decimal>("Subtotal")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Tax")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Total")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Orders", (string)null);
@@ -94,6 +106,12 @@ namespace NorthWind.Sales.Backend.DataContexts.EFCore.Migrations.NorthWindSales
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("Identification")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nchar(10)")
+                        .IsFixedLength();
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -108,30 +126,35 @@ namespace NorthWind.Sales.Backend.DataContexts.EFCore.Migrations.NorthWindSales
                         {
                             Id = "ALFKI",
                             CurrentBalance = 0m,
+                            Identification = "0102030405",
                             Name = "Alfreds Futterkiste"
                         },
                         new
                         {
                             Id = "ANATR",
                             CurrentBalance = 0m,
+                            Identification = "0203040506",
                             Name = "Ana Trujillo Emparedados y helados"
                         },
                         new
                         {
                             Id = "ANTON",
                             CurrentBalance = 100.00m,
+                            Identification = "0304050607",
                             Name = "Antonio Moreno Taqueria"
                         },
                         new
                         {
                             Id = "AROUT",
                             CurrentBalance = 0m,
+                            Identification = "0405060708",
                             Name = "Around the Horn"
                         },
                         new
                         {
                             Id = "BERGS",
                             CurrentBalance = 0m,
+                            Identification = "0506070809",
                             Name = "Berglunds snabbkop"
                         });
                 });
@@ -169,6 +192,12 @@ namespace NorthWind.Sales.Backend.DataContexts.EFCore.Migrations.NorthWindSales
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<decimal>("UnitPrice")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
@@ -185,6 +214,7 @@ namespace NorthWind.Sales.Backend.DataContexts.EFCore.Migrations.NorthWindSales
                         {
                             Id = 1,
                             Name = "Chai",
+                            RowVersion = new byte[0],
                             UnitPrice = 35.00m,
                             UnitsInStock = (short)20
                         },
@@ -192,6 +222,7 @@ namespace NorthWind.Sales.Backend.DataContexts.EFCore.Migrations.NorthWindSales
                         {
                             Id = 2,
                             Name = "Chang",
+                            RowVersion = new byte[0],
                             UnitPrice = 55.00m,
                             UnitsInStock = (short)0
                         },
@@ -199,6 +230,7 @@ namespace NorthWind.Sales.Backend.DataContexts.EFCore.Migrations.NorthWindSales
                         {
                             Id = 3,
                             Name = "Aniseed Syrup",
+                            RowVersion = new byte[0],
                             UnitPrice = 65.00m,
                             UnitsInStock = (short)20
                         },
@@ -206,6 +238,7 @@ namespace NorthWind.Sales.Backend.DataContexts.EFCore.Migrations.NorthWindSales
                         {
                             Id = 4,
                             Name = "Chef Anton's Cajun Seasoning",
+                            RowVersion = new byte[0],
                             UnitPrice = 75.00m,
                             UnitsInStock = (short)40
                         },
@@ -213,6 +246,7 @@ namespace NorthWind.Sales.Backend.DataContexts.EFCore.Migrations.NorthWindSales
                         {
                             Id = 5,
                             Name = "Chef Anton's Gumbo Mix",
+                            RowVersion = new byte[0],
                             UnitPrice = 50.00m,
                             UnitsInStock = (short)20
                         });
