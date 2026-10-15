@@ -1,3 +1,5 @@
+using NorthWind.Sales.Entities.Enums;
+
 namespace NorthWind.Sales.Backend.Controllers;
 
 public static class SearchCustomersController
@@ -6,6 +8,7 @@ public static class SearchCustomersController
     {
         app.MapGet(Endpoints.SearchCustomers, async (
             [FromQuery] string? searchTerm,
+            [FromQuery] CustomerSearchCriteria? criteria,
             [FromQuery] int? pageNumber,
             [FromQuery] int? pageSize,
             ISearchCustomersInputPort inputPort,
@@ -14,6 +17,7 @@ public static class SearchCustomersController
         {
             var query = new SearchCustomersQueryDto(
                 searchTerm,
+                criteria ?? CustomerSearchCriteria.All,
                 pageNumber ?? 1,
                 pageSize ?? 10);
 

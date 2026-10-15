@@ -1,4 +1,5 @@
 @page "/invoices"
+@page "/invoices/{OrderId:int}"
 @attribute [Authorize]
 
 <PageTitle>@ViewMessages.InvoiceSearchTitle - NorthWind</PageTitle>
@@ -7,16 +8,10 @@
     <div class="row">
         <div class="col-12 col-xl-11 mx-auto">
             <div class="card shadow-sm mb-4">
-                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                <div class="card-header bg-dark text-white">
                     <h5 class="mb-0">
                         <i class="bi bi-receipt-cutoff me-2"></i>@ViewMessages.InvoiceSearchTitle
                     </h5>
-                    @if (_selectedInvoice is not null)
-                    {
-                        <button type="button" class="btn btn-sm btn-outline-light" @onclick="ClearSelectedInvoice">
-                            <i class="bi bi-arrow-left me-1"></i>@ViewMessages.BackToSearchButton
-                        </button>
-                    }
                 </div>
                 <div class="card-body">
                     <ExceptionDisplay Exception="@_currentException" />
@@ -25,15 +20,56 @@
                     {
                         <!-- PANEL DE BÚSQUEDA DE FACTURAS -->
                         <div class="row mb-3">
-                            <div class="col-md-8 col-lg-6">
+                            <div class="col-md-10 col-lg-8">
                                 <div class="input-group">
+                                    <button class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center gap-1 px-3 shadow-none"
+                                            type="button"
+                                            @onclick="ToggleCriteriaDropdown"
+                                            aria-expanded="@_isDropdownOpen">
+                                        <i class="@GetCriteriaIcon(_selectedCriteria) text-primary"></i>
+                                        <span class="fw-semibold">@GetCriteriaLabel(_selectedCriteria)</span>
+                                    </button>
+
+                                    <div class="dropdown-menu shadow @(_isDropdownOpen ? "show" : "")" style="position: absolute; z-index: 1050; top: 100%; left: 0;">
+                                        <button class="dropdown-item d-flex align-items-center gap-2 @(_selectedCriteria == OrderSearchCriteria.All ? "active" : "")"
+                                                type="button"
+                                                @onclick="() => SelectCriteriaAsync(OrderSearchCriteria.All)">
+                                            <i class="bi bi-grid-fill"></i>
+                                            <span>@ViewMessages.CriteriaAll</span>
+                                        </button>
+                                        <button class="dropdown-item d-flex align-items-center gap-2 @(_selectedCriteria == OrderSearchCriteria.OrderId ? "active" : "")"
+                                                type="button"
+                                                @onclick="() => SelectCriteriaAsync(OrderSearchCriteria.OrderId)">
+                                            <i class="bi bi-receipt"></i>
+                                            <span>@ViewMessages.CriteriaInvoiceId</span>
+                                        </button>
+                                        <button class="dropdown-item d-flex align-items-center gap-2 @(_selectedCriteria == OrderSearchCriteria.CustomerName ? "active" : "")"
+                                                type="button"
+                                                @onclick="() => SelectCriteriaAsync(OrderSearchCriteria.CustomerName)">
+                                            <i class="bi bi-person-badge"></i>
+                                            <span>@ViewMessages.CriteriaName</span>
+                                        </button>
+                                        <button class="dropdown-item d-flex align-items-center gap-2 @(_selectedCriteria == OrderSearchCriteria.CustomerIdentification ? "active" : "")"
+                                                type="button"
+                                                @onclick="() => SelectCriteriaAsync(OrderSearchCriteria.CustomerIdentification)">
+                                            <i class="bi bi-card-text"></i>
+                                            <span>@ViewMessages.CriteriaIdentification</span>
+                                        </button>
+                                        <button class="dropdown-item d-flex align-items-center gap-2 @(_selectedCriteria == OrderSearchCriteria.CustomerId ? "active" : "")"
+                                                type="button"
+                                                @onclick="() => SelectCriteriaAsync(OrderSearchCriteria.CustomerId)">
+                                            <i class="bi bi-key-fill"></i>
+                                            <span>@ViewMessages.CriteriaCustomerId</span>
+                                        </button>
+                                    </div>
+
                                     <input type="text"
                                            class="form-control"
-                                           placeholder="@ViewMessages.InvoiceSearchPlaceholder"
+                                           placeholder="@GetSearchPlaceholder()"
                                            value="@_searchTerm"
                                            @oninput="HandleSearchInput"
                                            @onkeydown="HandleKeyDown" />
-                                    <button class="btn btn-primary" type="button" @onclick="() => SearchOrdersAsync(1)" disabled="@_isLoading">
+                                    <button class="btn btn-primary px-3" type="button" @onclick="() => SearchOrdersAsync(1)" disabled="@_isLoading">
                                         <i class="bi bi-search me-1"></i>@ViewMessages.SearchButton
                                     </button>
                                     <button class="btn btn-outline-secondary" type="button" @onclick="ClearSearchAsync" disabled="@_isLoading">
@@ -78,10 +114,11 @@
                                         {
                                             <tr>
                                                 <td class="fw-bold text-primary">#@order.OrderId</td>
-                                                <td>@order.OrderDate.ToLocalTime().ToString("g")</td>
+                                                <td>@order.OrderDate.ToEcuadorTime().ToString("g")</td>
                                                 <td>
                                                     <strong>@order.CustomerName</strong>
                                                     <span class="text-muted small d-block">ID: @order.CustomerId</span>
+                                                    <span class="text-muted small d-block">Cédula: @order.CustomerIdentification</span>
                                                 </td>
                                                 <td class="text-center">
                                                     <span class="badge bg-secondary">@order.ItemsCount</span>
@@ -166,8 +203,8 @@
                                     <div class="border border-2 border-primary rounded p-2 d-inline-block text-start">
                                         <h5 class="fw-bold text-primary mb-1 text-center">FACTURA ELECTRÓNICA</h5>
                                         <div class="text-center fw-bold fs-5 text-dark mb-1">No. @(_selectedInvoice.OrderId.ToString("D8"))</div>
-                                        <small class="d-block text-muted"><strong>Fecha:</strong> @_selectedInvoice.OrderDate.ToLocalTime().ToString("g")</small>
-                                        <small class="d-block text-success fw-bold">ESTADO: AUTORIZADA</small>
+                                        <small class="d-block text-muted"><strong>Fecha:</strong> @_selectedInvoice.OrderDate.ToEcuadorTime().ToString("g")</small>
+                                        <small class="d-block text-warning fw-bold">ESTADO: EN PRUEBAS</small>
                                     </div>
                                 </div>
                             </div>
@@ -246,12 +283,20 @@
 </div>
 
 @code {
+    [Parameter]
+    public int? OrderId { get; set; }
+
     [Inject]
     public IOrderInvoiceGateway InvoiceGateway { get; set; } = default!;
 
     [Inject]
     public IJSRuntime JSRuntime { get; set; } = default!;
 
+    [Inject]
+    public NavigationManager NavigationManager { get; set; } = default!;
+
+    private OrderSearchCriteria _selectedCriteria = OrderSearchCriteria.All;
+    private bool _isDropdownOpen = false;
     private string _searchTerm = string.Empty;
     private int _currentPage = 1;
     private const int PageSize = 10;
@@ -272,6 +317,53 @@
     {
         await SearchOrdersAsync(1);
     }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (OrderId.HasValue && OrderId.Value > 0)
+        {
+            await LoadInvoiceAsync(OrderId.Value);
+        }
+    }
+
+    private void ToggleCriteriaDropdown()
+    {
+        _isDropdownOpen = !_isDropdownOpen;
+    }
+
+    private async Task SelectCriteriaAsync(OrderSearchCriteria criteria)
+    {
+        _selectedCriteria = criteria;
+        _isDropdownOpen = false;
+        await SearchOrdersAsync(1);
+    }
+
+    private string GetCriteriaLabel(OrderSearchCriteria criteria) => criteria switch
+    {
+        OrderSearchCriteria.OrderId => ViewMessages.CriteriaInvoiceId,
+        OrderSearchCriteria.CustomerName => ViewMessages.CriteriaName,
+        OrderSearchCriteria.CustomerIdentification => ViewMessages.CriteriaIdentification,
+        OrderSearchCriteria.CustomerId => ViewMessages.CriteriaCustomerId,
+        _ => ViewMessages.CriteriaAll
+    };
+
+    private string GetCriteriaIcon(OrderSearchCriteria criteria) => criteria switch
+    {
+        OrderSearchCriteria.OrderId => "bi bi-receipt",
+        OrderSearchCriteria.CustomerName => "bi bi-person-badge",
+        OrderSearchCriteria.CustomerIdentification => "bi bi-card-text",
+        OrderSearchCriteria.CustomerId => "bi bi-key-fill",
+        _ => "bi bi-grid-fill"
+    };
+
+    private string GetSearchPlaceholder() => _selectedCriteria switch
+    {
+        OrderSearchCriteria.OrderId => "Buscar por No. de Factura (ej. 10248)...",
+        OrderSearchCriteria.CustomerName => "Buscar por Nombre o Razón Social de cliente...",
+        OrderSearchCriteria.CustomerIdentification => "Buscar por Cédula o RUC del cliente...",
+        OrderSearchCriteria.CustomerId => "Buscar por Código ID de cliente (ej. ALFKI)...",
+        _ => "Buscar por No. Factura, Nombre, Cédula o ID de Cliente..."
+    };
 
     private void HandleSearchInput(ChangeEventArgs e)
     {
@@ -294,7 +386,7 @@
 
         try
         {
-            var result = await InvoiceGateway.SearchOrdersAsync(_searchTerm, _currentPage, PageSize);
+            var result = await InvoiceGateway.SearchOrdersAsync(_searchTerm, _selectedCriteria, _currentPage, PageSize);
             _orders = result.Items;
             _totalCount = result.TotalCount;
             _totalPages = (int)Math.Ceiling((double)_totalCount / PageSize);
@@ -359,6 +451,11 @@
     {
         _selectedInvoice = null;
         _currentException = null;
+        if (OrderId.HasValue)
+        {
+            OrderId = null;
+            NavigationManager.NavigateTo("invoices");
+        }
     }
 
     private async Task DownloadPdfAsync()

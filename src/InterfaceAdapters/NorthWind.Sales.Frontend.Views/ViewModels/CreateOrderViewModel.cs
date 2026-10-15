@@ -8,8 +8,6 @@ public class CreateOrderViewModel
 
     public string CustomerIdentification { get; set; } = string.Empty;
 
-    public decimal? CustomerBalance { get; set; }
-
     public string ShipAddress { get; set; } = string.Empty;
 
     public string ShipCity { get; set; } = string.Empty;
@@ -31,7 +29,6 @@ public class CreateOrderViewModel
         CustomerId = customer.Id;
         CustomerName = customer.Name;
         CustomerIdentification = customer.Identification;
-        CustomerBalance = customer.CurrentBalance;
     }
 
     public void AddOrUpdateDetail(int productId, string productName, decimal unitPrice, short quantity = 1)
@@ -40,6 +37,7 @@ public class CreateOrderViewModel
         if (existing != null)
         {
             existing.Quantity = (short)(existing.Quantity + quantity);
+            existing.RawQuantity = existing.Quantity.ToString();
         }
         else
         {
@@ -48,21 +46,54 @@ public class CreateOrderViewModel
                 ProductId = productId,
                 ProductName = productName,
                 UnitPrice = unitPrice,
-                Quantity = quantity
+                Quantity = quantity,
+                RawQuantity = quantity.ToString()
             });
         }
     }
 
-    public void UpdateQuantity(CreateOrderDetailViewModel detail, short newQuantity)
+    public void ReplaceDetail(int oldProductId, int newProductId, string newProductName, decimal newUnitPrice)
     {
-        if (newQuantity <= 0)
+        var existingIndex = OrderDetails.FindIndex(d => d.ProductId == oldProductId);
+        if (existingIndex >= 0)
         {
-            RemoveDetail(detail);
+            var alreadyInListIndex = OrderDetails.FindIndex(d => d.ProductId == newProductId);
+            if (alreadyInListIndex >= 0 && alreadyInListIndex != existingIndex)
+            {
+                // Si el producto nuevo ya existía en otra fila, sumamos 1 a esa fila y quitamos la vieja
+                OrderDetails[alreadyInListIndex].Quantity = (short)(OrderDetails[alreadyInListIndex].Quantity + 1);
+                OrderDetails[alreadyInListIndex].RawQuantity = OrderDetails[alreadyInListIndex].Quantity.ToString();
+                OrderDetails.RemoveAt(existingIndex);
+            }
+            else
+            {
+                OrderDetails[existingIndex] = new CreateOrderDetailViewModel
+                {
+                    ProductId = newProductId,
+                    ProductName = newProductName,
+                    UnitPrice = newUnitPrice,
+                    Quantity = 1,
+                    RawQuantity = "1"
+                };
+            }
         }
-        else
-        {
-            detail.Quantity = newQuantity;
-        }
+    }
+
+    public void UpdateQuantity(CreateOrderDetailViewModel detail, short newQuantity, string? rawQuantity = null)
+    {
+        detail.Quantity = newQuantity;
+        detail.RawQuantity = rawQuantity ?? newQuantity.ToString();
+    }
+
+    public void ClearCustomer()
+    {
+        CustomerId = string.Empty;
+        CustomerName = string.Empty;
+        CustomerIdentification = string.Empty;
+        ShipAddress = string.Empty;
+        ShipCity = string.Empty;
+        ShipCountry = string.Empty;
+        ShipPostalCode = string.Empty;
     }
 
     public void RemoveDetail(CreateOrderDetailViewModel detail)
@@ -75,7 +106,6 @@ public class CreateOrderViewModel
         CustomerId = string.Empty;
         CustomerName = string.Empty;
         CustomerIdentification = string.Empty;
-        CustomerBalance = null;
         ShipAddress = string.Empty;
         ShipCity = string.Empty;
         ShipCountry = string.Empty;

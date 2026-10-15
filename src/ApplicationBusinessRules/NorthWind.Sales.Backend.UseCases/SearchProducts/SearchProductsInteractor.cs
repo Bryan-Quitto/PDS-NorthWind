@@ -12,6 +12,7 @@ public class SearchProductsInteractor(
     {
         var result = await queriesRepository.SearchProductsAsync(
             queryDto.SearchTerm,
+            queryDto.Criteria,
             queryDto.PageNumber,
             queryDto.PageSize,
             cancellationToken);

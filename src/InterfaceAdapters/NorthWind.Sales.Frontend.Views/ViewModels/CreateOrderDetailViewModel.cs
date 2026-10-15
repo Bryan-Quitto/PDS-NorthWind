@@ -9,6 +9,7 @@ public class CreateOrderDetailViewModel
     public decimal UnitPrice { get; set; }
 
     public short Quantity { get; set; } = 1;
+    public string RawQuantity { get; set; } = "1";
 
     public decimal LineTotal => UnitPrice * Quantity;
 

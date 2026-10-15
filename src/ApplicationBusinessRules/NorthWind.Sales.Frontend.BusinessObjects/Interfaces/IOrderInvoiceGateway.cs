@@ -1,9 +1,12 @@
+using NorthWind.Sales.Entities.Enums;
+
 namespace NorthWind.Sales.Frontend.BusinessObjects.Interfaces;
 
 public interface IOrderInvoiceGateway
 {
     Task<PaginatedResultDto<OrderSummaryDto>> SearchOrdersAsync(
         string? searchTerm,
+        OrderSearchCriteria criteria = OrderSearchCriteria.All,
         int pageNumber = 1,
         int pageSize = 10,
         CancellationToken cancellationToken = default);

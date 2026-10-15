@@ -1,3 +1,5 @@
+using NorthWind.Sales.Entities.Enums;
+
 namespace NorthWind.Sales.Backend.Controllers;
 
 public static class OrderInvoicesController
@@ -7,6 +9,7 @@ public static class OrderInvoicesController
         // 1. Endpoint para búsqueda paginada de órdenes
         app.MapGet(Endpoints.SearchOrders, async (
             [FromQuery] string? searchTerm,
+            [FromQuery] OrderSearchCriteria? criteria,
             [FromQuery] int? pageNumber,
             [FromQuery] int? pageSize,
             ISearchOrdersInputPort inputPort,
@@ -15,6 +18,7 @@ public static class OrderInvoicesController
         {
             var query = new SearchOrdersQueryDto(
                 searchTerm,
+                criteria ?? OrderSearchCriteria.All,
                 pageNumber ?? 1,
                 pageSize ?? 10);
 

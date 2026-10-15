@@ -1,3 +1,5 @@
+using NorthWind.Sales.Entities.Enums;
+
 namespace NorthWind.Sales.Backend.Controllers;
 
 public static class SearchProductsController
@@ -6,6 +8,7 @@ public static class SearchProductsController
     {
         app.MapGet(Endpoints.SearchProducts, async (
             [FromQuery] string? searchTerm,
+            [FromQuery] ProductSearchCriteria? criteria,
             [FromQuery] int? pageNumber,
             [FromQuery] int? pageSize,
             ISearchProductsInputPort inputPort,
@@ -14,6 +17,7 @@ public static class SearchProductsController
         {
             var query = new SearchProductsQueryDto(
                 searchTerm,
+                criteria ?? ProductSearchCriteria.All,
                 pageNumber ?? 1,
                 pageSize ?? 10);
 

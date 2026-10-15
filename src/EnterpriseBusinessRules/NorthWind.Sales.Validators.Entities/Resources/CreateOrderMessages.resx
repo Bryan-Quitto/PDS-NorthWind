@@ -59,10 +59,31 @@
   <data name="QuantityGreaterThanZero" xml:space="preserve">
     <value>La cantidad debe ser mayor a cero.</value>
   </data>
+  <data name="QuantityMustBeInteger" xml:space="preserve">
+    <value>La cantidad debe ser un número entero.</value>
+  </data>
   <data name="CustomerIdentificationRequired" xml:space="preserve">
     <value>La identificación del cliente es requerida.</value>
   </data>
   <data name="CustomerIdentificationInvalid" xml:space="preserve">
     <value>La cédula ingresada no es válida para Ecuador.</value>
+  </data>
+  <data name="ShipAddressMaxLength" xml:space="preserve">
+    <value>La dirección de envío no puede exceder los 60 caracteres.</value>
+  </data>
+  <data name="ShipCityMaxLength" xml:space="preserve">
+    <value>La ciudad de envío no puede exceder los 15 caracteres.</value>
+  </data>
+  <data name="ShipCityInvalid" xml:space="preserve">
+    <value>La ciudad de envío no debe contener números ni caracteres especiales no permitidos.</value>
+  </data>
+  <data name="ShipCountryMaxLength" xml:space="preserve">
+    <value>El país de envío no puede exceder los 15 caracteres.</value>
+  </data>
+  <data name="ShipCountryInvalid" xml:space="preserve">
+    <value>El país de envío no debe contener números ni caracteres especiales no permitidos.</value>
+  </data>
+  <data name="ShipPostalCodeMaxLength" xml:space="preserve">
+    <value>El código postal no puede exceder los 10 caracteres.</value>
   </data>
 </root>

@@ -32,9 +32,32 @@
                         <span class="fw-bold text-primary">
                             <i class="bi bi-person-badge me-1"></i> @ViewMessages.CustomerSectionTitle
                         </span>
-                        <button type="button" class="btn btn-sm btn-outline-primary" @onclick="OpenCustomerModal">
-                            <i class="bi bi-search me-1"></i> @ViewMessages.SearchCustomerButton
-                        </button>
+                        <div class="d-flex align-items-center gap-2">
+                            @if (!string.IsNullOrWhiteSpace(Model.CustomerId))
+                            {
+                                @if (_isConfirmingClearCustomer)
+                                {
+                                    <div class="d-inline-flex align-items-center gap-1 bg-white px-2 py-1 border rounded shadow-sm">
+                                        <span class="small fw-bold text-danger me-1">¿Limpiar cliente?</span>
+                                        <button type="button" class="btn btn-sm btn-success py-0 px-2" title="Confirmar" @onclick="ConfirmClearCustomer">
+                                            <i class="bi bi-check-lg"></i> Sí
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-secondary py-0 px-2" title="Cancelar" @onclick="CancelClearCustomer">
+                                            <i class="bi bi-x-lg"></i> No
+                                        </button>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <button type="button" class="btn btn-sm btn-outline-danger" title="Limpiar Cliente" @onclick="AskClearCustomer">
+                                        <i class="bi bi-person-x me-1"></i> Limpiar cliente
+                                    </button>
+                                }
+                            }
+                            <button type="button" class="btn btn-sm btn-outline-primary" @onclick="OpenCustomerModal">
+                                <i class="bi bi-search me-1"></i> @ViewMessages.SearchCustomerButton
+                            </button>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div class="row g-3">
@@ -48,7 +71,7 @@
                                 <ValidationMessage For="@(() => Model.CustomerId)" class="text-danger small mt-1" />
                             </div>
 
-                            <div class="col-md-4">
+                            <div class="col-md-5">
                                 <label for="customerName" class="form-label fw-bold">@ViewMessages.CustomerNameLabel</label>
                                 <input id="customerName"
                                        type="text"
@@ -57,7 +80,7 @@
                                        readonly />
                             </div>
 
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <label for="customerIdentification" class="form-label fw-bold">@ViewMessages.CustomerIdentificationLabel</label>
                                 <input id="customerIdentification"
                                        type="text"
@@ -66,36 +89,27 @@
                                        readonly />
                             </div>
 
-                            <div class="col-md-2">
-                                <label for="customerBalance" class="form-label fw-bold">@ViewMessages.CustomerBalanceLabel</label>
-                                <input id="customerBalance"
-                                       type="text"
-                                       class="form-control bg-light font-monospace text-end"
-                                       value="@(Model.CustomerBalance.HasValue ? Model.CustomerBalance.Value.ToString("C2") : string.Empty)"
-                                       readonly />
-                            </div>
-
                             <div class="col-md-6">
                                 <label for="shipAddress" class="form-label fw-bold">@ViewMessages.ShipAddressLabel</label>
-                                <InputText id="shipAddress" class="form-control" @bind-Value="Model.ShipAddress" />
+                                <InputText id="shipAddress" class="form-control" maxlength="60" @bind-Value="Model.ShipAddress" />
                                 <ValidationMessage For="@(() => Model.ShipAddress)" class="text-danger small mt-1" />
                             </div>
 
                             <div class="col-md-2">
                                 <label for="shipCity" class="form-label fw-bold">@ViewMessages.ShipCityLabel</label>
-                                <InputText id="shipCity" class="form-control" @bind-Value="Model.ShipCity" />
+                                <InputText id="shipCity" class="form-control" maxlength="15" @bind-Value="Model.ShipCity" />
                                 <ValidationMessage For="@(() => Model.ShipCity)" class="text-danger small mt-1" />
                             </div>
 
                             <div class="col-md-2">
                                 <label for="shipCountry" class="form-label fw-bold">@ViewMessages.ShipCountryLabel</label>
-                                <InputText id="shipCountry" class="form-control" @bind-Value="Model.ShipCountry" />
+                                <InputText id="shipCountry" class="form-control" maxlength="15" @bind-Value="Model.ShipCountry" />
                                 <ValidationMessage For="@(() => Model.ShipCountry)" class="text-danger small mt-1" />
                             </div>
 
                             <div class="col-md-2">
                                 <label for="shipPostalCode" class="form-label fw-bold">@ViewMessages.ShipPostalCodeLabel</label>
-                                <InputText id="shipPostalCode" class="form-control" @bind-Value="Model.ShipPostalCode" />
+                                <InputText id="shipPostalCode" class="form-control" maxlength="10" @bind-Value="Model.ShipPostalCode" />
                                 <ValidationMessage For="@(() => Model.ShipPostalCode)" class="text-danger small mt-1" />
                             </div>
                         </div>
@@ -108,9 +122,17 @@
                         <span class="fw-bold text-dark">
                             <i class="bi bi-cart3 me-1"></i> @ViewMessages.OrderDetailsTitle
                         </span>
-                        <button type="button" class="btn btn-sm btn-success" @onclick="OpenProductModal">
-                            <i class="bi bi-plus-circle me-1"></i> @ViewMessages.AddProductButton
-                        </button>
+                        <div class="d-flex align-items-center gap-2">
+                            @if (Model.OrderDetails.Count > 0)
+                            {
+                                <button type="button" class="btn btn-sm btn-outline-danger" @onclick="OpenClearProductsModal">
+                                    <i class="bi bi-trash3 me-1"></i> Limpiar productos
+                                </button>
+                            }
+                            <button type="button" class="btn btn-sm btn-success" @onclick="OpenProductModal">
+                                <i class="bi bi-plus-circle me-1"></i> @ViewMessages.AddProductButton
+                            </button>
+                        </div>
                     </div>
                     <div class="card-body p-0">
                         @if (Model.OrderDetails.Count == 0)
@@ -128,8 +150,8 @@
                                         <tr>
                                             <th style="width: 8%;">@ViewMessages.ProductIdLabel</th>
                                             <th style="width: 37%;">@ViewMessages.ProductNameLabel</th>
-                                            <th style="width: 15%;" class="text-end">@ViewMessages.UnitPriceLabel</th>
                                             <th style="width: 15%;" class="text-center">@ViewMessages.QuantityLabel</th>
+                                            <th style="width: 15%;" class="text-end">@ViewMessages.UnitPriceLabel</th>
                                             <th style="width: 15%;" class="text-end">@ViewMessages.SubtotalLineLabel</th>
                                             <th style="width: 10%;" class="text-center">@ViewMessages.ActionsLabel</th>
                                         </tr>
@@ -147,32 +169,62 @@
                                                            value="@detail.ProductName"
                                                            readonly />
                                                 </td>
+                                                <td class="text-center">
+                                                    <input type="number"
+                                                           step="1"
+                                                           min="1"
+                                                           class="form-control form-control-sm text-center mx-auto"
+                                                           style="max-width: 90px;"
+                                                           value="@detail.RawQuantity"
+                                                           @onchange="(e) => OnQuantityChanged(detail, e)" />
+                                                    <ValidationMessage For="@(() => detail.RawQuantity)" class="text-danger small" />
+                                                    <ValidationMessage For="@(() => detail.Quantity)" class="text-danger small" />
+                                                </td>
                                                 <td>
                                                     <input type="text"
                                                            class="form-control form-control-sm bg-light text-end font-monospace"
-                                                           value="@detail.UnitPrice.ToString("C2")"
+                                                           value="@detail.UnitPrice.ToString("N2")"
                                                            readonly />
                                                     <ValidationMessage For="@(() => detail.UnitPrice)" class="text-danger small" />
                                                 </td>
-                                                <td class="text-center">
-                                                    <input type="number"
-                                                           class="form-control form-control-sm text-center mx-auto"
-                                                           style="max-width: 90px;"
-                                                           min="1"
-                                                           value="@detail.Quantity"
-                                                           @onchange="(e) => OnQuantityChanged(detail, e)" />
-                                                    <ValidationMessage For="@(() => detail.Quantity)" class="text-danger small" />
-                                                </td>
                                                 <td class="text-end font-monospace fw-bold">
-                                                    @detail.LineTotal.ToString("C2")
+                                                    @detail.LineTotal.ToString("N2")
                                                 </td>
                                                 <td class="text-center">
-                                                    <button type="button"
-                                                            class="btn btn-sm btn-outline-danger"
-                                                            title="@ViewMessages.RemoveProductButton"
-                                                            @onclick="() => RemoveDetail(detail)">
-                                                        <i class="bi bi-trash"></i> @ViewMessages.RemoveProductButton
-                                                    </button>
+                                                    @if (_confirmingDeleteProductId == detail.ProductId)
+                                                    {
+                                                        <div class="d-inline-flex align-items-center gap-1 bg-white p-1 border rounded shadow-sm">
+                                                            <button type="button"
+                                                                    class="btn btn-sm btn-danger py-0 px-2"
+                                                                    title="Confirmar eliminación"
+                                                                    @onclick="() => ConfirmRemoveDetail(detail)">
+                                                                <i class="bi bi-check-lg"></i> Sí
+                                                            </button>
+                                                            <button type="button"
+                                                                    class="btn btn-sm btn-secondary py-0 px-2"
+                                                                    title="Cancelar"
+                                                                    @onclick="CancelRemoveDetail">
+                                                                <i class="bi bi-x-lg"></i> No
+                                                            </button>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="d-inline-flex align-items-center gap-1">
+                                                            <button type="button"
+                                                                    class="btn btn-sm btn-outline-primary"
+                                                                    title="Reemplazar por otro producto"
+                                                                    @onclick="() => OpenReplaceProductModal(detail.ProductId)">
+                                                                <i class="bi bi-arrow-left-right"></i> Reemplazar
+                                                            </button>
+                                                            <button type="button"
+                                                                    class="btn btn-sm btn-outline-danger"
+                                                                    title="@ViewMessages.RemoveProductButton"
+                                                                    @onclick="() => AskRemoveDetail(detail.ProductId)">
+                                                                <i class="bi bi-trash"></i> @ViewMessages.RemoveProductButton
+                                                            </button>
+                                                        </div>
+                                                    }
                                                 </td>
                                             </tr>
                                         }
@@ -206,19 +258,29 @@
                     </div>
                 </div>
 
-                <!-- BOTÓN DE ACCIÓN FINAL -->
-                <div class="d-flex justify-content-end gap-2">
-                    <button type="submit" class="btn btn-primary btn-lg px-4" disabled="@(_isSubmitting || Model.OrderDetails.Count == 0)">
-                        @if (_isSubmitting)
-                        {
-                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                            @ViewMessages.SubmittingOrderButton
-                        }
-                        else
-                        {
-                            <i class="bi bi-check2-circle me-1"></i> @ViewMessages.SubmitOrderButton
-                        }
-                    </button>
+                <!-- BOTONES DE ACCIÓN FINAL -->
+                <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                    <div>
+                        <button type="button"
+                                class="btn btn-outline-danger btn-lg px-4"
+                                disabled="@_isSubmitting"
+                                @onclick="OpenClearOrderModal">
+                            <i class="bi bi-trash3 me-1"></i> Limpiar orden
+                        </button>
+                    </div>
+                    <div>
+                        <button type="submit" class="btn btn-primary btn-lg px-4" disabled="@(_isSubmitting || Model.OrderDetails.Count == 0)">
+                            @if (_isSubmitting)
+                            {
+                                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                @ViewMessages.SubmittingOrderButton
+                            }
+                            else
+                            {
+                                <i class="bi bi-check2-circle me-1"></i> @ViewMessages.SubmitOrderButton
+                            }
+                        </button>
+                    </div>
                 </div>
             </EditForm>
         }
@@ -230,7 +292,68 @@
                      OnCustomerSelected="HandleCustomerSelected" />
 
 <ProductSearchModal @bind-IsOpen="_isProductModalOpen"
+                    ExcludedProductId="_replacingProductId"
                     OnProductSelected="HandleProductSelected" />
+
+<!-- MODAL DE CONFIRMACIÓN: LIMPIAR PRODUCTOS -->
+@if (_isClearProductsModalOpen)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.5);">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i> Confirmar Limpieza de Productos
+                    </h5>
+                    <button type="button" class="btn-close" @onclick="CloseClearProductsModal"></button>
+                </div>
+                <div class="modal-body py-4">
+                    <p class="mb-0 fs-6">
+                        ¿Está seguro de que desea eliminar todos los productos del detalle? La información del cliente y envío se mantendrá.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseClearProductsModal">
+                        Cancelar
+                    </button>
+                    <button type="button" class="btn btn-warning" @onclick="ConfirmClearProducts">
+                        <i class="bi bi-trash3 me-1"></i> Sí, Limpiar Productos
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- MODAL DE CONFIRMACIÓN: LIMPIAR ORDEN COMPLETA -->
+@if (_isClearOrderModalOpen)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.5);">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i> Confirmar Limpieza de Toda la Orden
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" @onclick="CloseClearOrderModal"></button>
+                </div>
+                <div class="modal-body py-4">
+                    <p class="mb-0 fs-6">
+                        ¿Está seguro de que desea reiniciar toda la orden? Se borrarán los datos del cliente, envío y todos los productos agregados.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseClearOrderModal">
+                        Cancelar
+                    </button>
+                    <button type="button" class="btn btn-danger" @onclick="ConfirmClearOrder">
+                        <i class="bi bi-trash3 me-1"></i> Sí, Limpiar Toda la Orden
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 
 @code {
     [Parameter]
@@ -238,6 +361,9 @@
 
     [Inject]
     public ICreateOrderGateway OrderGateway { get; set; } = default!;
+
+    [Inject]
+    public NavigationManager NavigationManager { get; set; } = default!;
 
     private EditContext _editContext = default!;
     private ValidationMessageStore _serverMessageStore = default!;
@@ -247,6 +373,11 @@
 
     private bool _isCustomerModalOpen;
     private bool _isProductModalOpen;
+    private bool _isClearProductsModalOpen;
+    private bool _isClearOrderModalOpen;
+    private bool _isConfirmingClearCustomer;
+    private int? _confirmingDeleteProductId;
+    private int? _replacingProductId;
 
     protected override void OnInitialized()
     {
@@ -269,14 +400,87 @@
         _isCustomerModalOpen = true;
     }
 
+    private void AskClearCustomer()
+    {
+        _isConfirmingClearCustomer = true;
+    }
+
+    private void ConfirmClearCustomer()
+    {
+        Model.ClearCustomer();
+        _isConfirmingClearCustomer = false;
+        _serverMessageStore.Clear(_editContext.Field(nameof(Model.CustomerId)));
+        _serverMessageStore.Clear(_editContext.Field(nameof(Model.ShipAddress)));
+        _serverMessageStore.Clear(_editContext.Field(nameof(Model.ShipCity)));
+        _serverMessageStore.Clear(_editContext.Field(nameof(Model.ShipCountry)));
+        _serverMessageStore.Clear(_editContext.Field(nameof(Model.ShipPostalCode)));
+        _editContext.NotifyValidationStateChanged();
+        StateHasChanged();
+    }
+
+    private void CancelClearCustomer()
+    {
+        _isConfirmingClearCustomer = false;
+    }
+
     private void OpenProductModal()
     {
+        _replacingProductId = null;
         _isProductModalOpen = true;
+    }
+
+    private void OpenReplaceProductModal(int productId)
+    {
+        _confirmingDeleteProductId = null;
+        _replacingProductId = productId;
+        _isProductModalOpen = true;
+    }
+
+    private void OpenClearProductsModal()
+    {
+        _isClearProductsModalOpen = true;
+    }
+
+    private void CloseClearProductsModal()
+    {
+        _isClearProductsModalOpen = false;
+    }
+
+    private void ConfirmClearProducts()
+    {
+        Model.OrderDetails.Clear();
+        _confirmingDeleteProductId = null;
+        _replacingProductId = null;
+        _isClearProductsModalOpen = false;
+        _editContext.NotifyValidationStateChanged();
+        StateHasChanged();
+    }
+
+    private void OpenClearOrderModal()
+    {
+        _isClearOrderModalOpen = true;
+    }
+
+    private void CloseClearOrderModal()
+    {
+        _isClearOrderModalOpen = false;
+    }
+
+    private void ConfirmClearOrder()
+    {
+        Model.Reset();
+        _confirmingDeleteProductId = null;
+        _replacingProductId = null;
+        _isConfirmingClearCustomer = false;
+        _isClearOrderModalOpen = false;
+        InitializeEditContext();
+        StateHasChanged();
     }
 
     private void HandleCustomerSelected(CustomerDto customer)
     {
         Model.SetCustomer(customer);
+        _isConfirmingClearCustomer = false;
         _serverMessageStore.Clear(_editContext.Field(nameof(Model.CustomerId)));
         _editContext.NotifyValidationStateChanged();
         StateHasChanged();
@@ -284,28 +488,53 @@
 
     private void HandleProductSelected(ProductDto product)
     {
-        Model.AddOrUpdateDetail(product.Id, product.Name, product.UnitPrice, 1);
+        if (_replacingProductId.HasValue)
+        {
+            Model.ReplaceDetail(_replacingProductId.Value, product.Id, product.Name, product.UnitPrice);
+            _replacingProductId = null;
+        }
+        else
+        {
+            Model.AddOrUpdateDetail(product.Id, product.Name, product.UnitPrice, 1);
+        }
+
         _editContext.NotifyValidationStateChanged();
         StateHasChanged();
     }
 
     private void OnQuantityChanged(CreateOrderDetailViewModel detail, ChangeEventArgs e)
     {
-        if (short.TryParse(e.Value?.ToString(), out var qty))
+        var rawVal = e.Value?.ToString() ?? string.Empty;
+
+        if (short.TryParse(rawVal, out var qty))
         {
-            Model.UpdateQuantity(detail, qty);
+            Model.UpdateQuantity(detail, qty, rawVal);
         }
         else
         {
-            Model.UpdateQuantity(detail, 1);
+            Model.UpdateQuantity(detail, 0, rawVal);
         }
-        _editContext.NotifyValidationStateChanged();
+
+        // Notifica cambios tanto para RawQuantity como para Quantity para que se ejecuten las validaciones
+        _editContext.NotifyFieldChanged(new FieldIdentifier(detail, nameof(detail.RawQuantity)));
+        _editContext.NotifyFieldChanged(new FieldIdentifier(detail, nameof(detail.Quantity)));
         StateHasChanged();
     }
 
-    private void RemoveDetail(CreateOrderDetailViewModel detail)
+    private void AskRemoveDetail(int productId)
+    {
+        _confirmingDeleteProductId = productId;
+    }
+
+    private void CancelRemoveDetail()
+    {
+        _confirmingDeleteProductId = null;
+    }
+
+    private void ConfirmRemoveDetail(CreateOrderDetailViewModel detail)
     {
         Model.RemoveDetail(detail);
+        _confirmingDeleteProductId = null;
         _editContext.NotifyValidationStateChanged();
         StateHasChanged();
     }
@@ -321,7 +550,7 @@
         {
             var dto = Model.ToDto();
             var orderId = await OrderGateway.CreateOrderAsync(dto);
-            _createdOrderId = orderId;
+            NavigationManager.NavigateTo($"invoices/{orderId}");
         }
         catch (Exception ex)
         {

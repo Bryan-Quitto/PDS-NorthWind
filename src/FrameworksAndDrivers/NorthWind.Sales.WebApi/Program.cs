@@ -4,10 +4,11 @@ using Microsoft.OpenApi.Models;
 using NorthWind.Membership.Backend.Core.Options;
 using System.Text;
 
-// Cargar variables de entorno desde archivo .env (si existe)
+// Cargar variables de entorno desde archivo .env (buscando en directorio actual y superiores)
 DotNetEnv.Env.TraversePath().Load();
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.AddEnvironmentVariables();
 
 // 1. Configuración de Swagger / OpenAPI con esquema HTTP Bearer en .NET 10
 builder.Services.AddEndpointsApiExplorer();

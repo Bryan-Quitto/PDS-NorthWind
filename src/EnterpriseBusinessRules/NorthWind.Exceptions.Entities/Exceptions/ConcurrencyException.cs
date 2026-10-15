@@ -5,7 +5,7 @@ public class ConcurrencyException : Exception
     public IReadOnlyList<string> Entries { get; }
 
     public ConcurrencyException()
-        : base("A concurrency conflict occurred. The data has been modified by another process.")
+        : base("El registro fue modificado por otra transacción en curso. Por favor, espere a que termine o intente nuevamente.")
     {
         Entries = [];
     }
@@ -23,7 +23,7 @@ public class ConcurrencyException : Exception
     }
 
     public ConcurrencyException(IEnumerable<string> entries)
-        : base("A concurrency conflict occurred. The data has been modified by another process.")
+        : base("El registro fue modificado por otra transacción en curso. Por favor, espere a que termine o intente nuevamente.")
     {
         Entries = [.. entries];
     }

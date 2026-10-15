@@ -13,7 +13,7 @@ public static class GuardDBContext
         catch (DbUpdateConcurrencyException ex)
         {
             var entries = ex.Entries.Select(e => e.Entity.GetType().Name).ToList();
-            throw new ConcurrencyException("A concurrency conflict occurred while saving changes to the database.", ex, entries);
+            throw new ConcurrencyException("El registro o producto ha sido modificado por otra transacción simultánea. Debe esperar a que termine la transacción anterior antes de reintentar.", ex, entries);
         }
         catch (DbUpdateException ex)
         {

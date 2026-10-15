@@ -58,10 +58,29 @@ public class NorthWindSalesContext(IOptions<DBOptions> dbOptions) : DbContext,
     {
         await OrderDetails.AddRangeAsync(orderDetails, cancellationToken);
     }
-
     public void UpdateProducts(IEnumerable<NorthWind.Sales.Backend.Repositories.Entities.Product> products)
     {
-        Products.UpdateRange(products);
+        foreach (var product in products)
+        {
+            var tracked = Products.Local.FirstOrDefault(p => p.Id == product.Id);
+            if (tracked != null)
+            {
+                tracked.UnitsInStock = product.UnitsInStock;
+                if (product.RowVersion != null)
+                {
+                    Entry(tracked).Property(p => p.RowVersion).OriginalValue = product.RowVersion;
+                }
+            }
+            else
+            {
+                var entry = Products.Attach(product);
+                entry.Property(p => p.UnitsInStock).IsModified = true;
+                if (product.RowVersion != null)
+                {
+                    entry.Property(p => p.RowVersion).OriginalValue = product.RowVersion;
+                }
+            }
+        }
     }
 
     public new async Task SaveChangesAsync(CancellationToken cancellationToken = default)

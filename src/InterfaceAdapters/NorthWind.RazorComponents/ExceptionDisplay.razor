@@ -11,7 +11,11 @@
                     <li>
                         @if (!string.IsNullOrWhiteSpace(error.PropertyName))
                         {
-                            <strong>@error.PropertyName: </strong>
+                            var friendlyName = GetFriendlyPropertyName(error.PropertyName);
+                            if (!string.IsNullOrWhiteSpace(friendlyName))
+                            {
+                                <strong>@friendlyName: </strong>
+                            }
                         }
                         @error.ErrorMessage
                     </li>
@@ -59,5 +63,47 @@
         }
 
         return [];
+    }
+
+    private static string GetFriendlyPropertyName(string propertyName)
+    {
+        if (string.IsNullOrWhiteSpace(propertyName)) return string.Empty;
+
+        // Si es una ruta técnica de colección como OrderDetails[0].Quantity o OrderDetails[0].ProductId
+        if (propertyName.StartsWith("OrderDetails[", StringComparison.OrdinalIgnoreCase))
+        {
+            var match = System.Text.RegularExpressions.Regex.Match(propertyName, @"OrderDetails\[(\d+)\](?:\.(\w+))?", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            if (match.Success)
+            {
+                var itemNumber = int.Parse(match.Groups[1].Value) + 1;
+                var subProp = match.Groups[2].Success ? match.Groups[2].Value : string.Empty;
+
+                return subProp.ToLowerInvariant() switch
+                {
+                    "quantity" => $"Ítem #{itemNumber} (Cantidad)",
+                    "productid" => $"Ítem #{itemNumber} (Producto)",
+                    "unitprice" => $"Ítem #{itemNumber} (Precio Unitario)",
+                    _ => $"Ítem #{itemNumber}"
+                };
+            }
+        }
+
+        return propertyName.ToLowerInvariant() switch
+        {
+            "customerid" => "Cliente",
+            "customername" => "Nombre del Cliente",
+            "customeridentification" => "Identificación",
+            "shipaddress" => "Dirección de Envío",
+            "shipcity" => "Ciudad de Envío",
+            "shipcountry" => "País de Envío",
+            "shippostalcode" => "Código Postal",
+            "orderdetails" => "Detalle de Productos",
+            "firstname" => "Nombre",
+            "lastname" => "Apellido",
+            "email" => "Correo Electrónico",
+            "password" => "Contraseña",
+            "passwordconfirmation" => "Confirmación de Contraseña",
+            _ => propertyName
+        };
     }
 }

@@ -1,14 +1,17 @@
+using NorthWind.Sales.Entities.Enums;
+
 namespace NorthWind.Sales.Frontend.WebApiGateways;
 
 public class SearchGateway(HttpClient client) : ISearchGateway
 {
     public async Task<PaginatedResultDto<CustomerDto>> SearchCustomersAsync(
         string? searchTerm,
+        CustomerSearchCriteria criteria = CustomerSearchCriteria.All,
         int pageNumber = 1,
         int pageSize = 10,
         CancellationToken cancellationToken = default)
     {
-        var queryString = BuildQueryString(searchTerm, pageNumber, pageSize);
+        var queryString = BuildQueryString(searchTerm, criteria.ToString(), pageNumber, pageSize);
         var requestUri = $"{Endpoints.SearchCustomers}{queryString}";
 
         var response = await client.GetAsync(requestUri, cancellationToken);
@@ -20,11 +23,12 @@ public class SearchGateway(HttpClient client) : ISearchGateway
 
     public async Task<PaginatedResultDto<ProductDto>> SearchProductsAsync(
         string? searchTerm,
+        ProductSearchCriteria criteria = ProductSearchCriteria.All,
         int pageNumber = 1,
         int pageSize = 10,
         CancellationToken cancellationToken = default)
     {
-        var queryString = BuildQueryString(searchTerm, pageNumber, pageSize);
+        var queryString = BuildQueryString(searchTerm, criteria.ToString(), pageNumber, pageSize);
         var requestUri = $"{Endpoints.SearchProducts}{queryString}";
 
         var response = await client.GetAsync(requestUri, cancellationToken);
@@ -34,10 +38,11 @@ public class SearchGateway(HttpClient client) : ISearchGateway
         return result ?? new PaginatedResultDto<ProductDto>([], 0, pageNumber, pageSize);
     }
 
-    private static string BuildQueryString(string? searchTerm, int pageNumber, int pageSize)
+    private static string BuildQueryString(string? searchTerm, string criteria, int pageNumber, int pageSize)
     {
         var parameters = new List<string>
         {
+            $"criteria={Uri.EscapeDataString(criteria)}",
             $"pageNumber={pageNumber}",
             $"pageSize={pageSize}"
         };

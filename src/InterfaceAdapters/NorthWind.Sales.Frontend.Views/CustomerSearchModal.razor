@@ -11,14 +11,49 @@
                 </div>
                 <div class="modal-body">
                     <div class="input-group mb-3">
+                        <button class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center gap-1 px-3 shadow-none"
+                                type="button"
+                                @onclick="ToggleCriteriaDropdown"
+                                aria-expanded="@_isDropdownOpen">
+                            <i class="@GetCriteriaIcon(_selectedCriteria) text-primary"></i>
+                            <span class="fw-semibold">@GetCriteriaLabel(_selectedCriteria)</span>
+                        </button>
+
+                        <div class="dropdown-menu shadow @(_isDropdownOpen ? "show" : "")" style="position: absolute; z-index: 1050; top: 100%; left: 0;">
+                            <button class="dropdown-item d-flex align-items-center gap-2 @(_selectedCriteria == CustomerSearchCriteria.All ? "active" : "")"
+                                    type="button"
+                                    @onclick="() => SelectCriteriaAsync(CustomerSearchCriteria.All)">
+                                <i class="bi bi-grid-fill"></i>
+                                <span>@ViewMessages.CriteriaAll</span>
+                            </button>
+                            <button class="dropdown-item d-flex align-items-center gap-2 @(_selectedCriteria == CustomerSearchCriteria.Identification ? "active" : "")"
+                                    type="button"
+                                    @onclick="() => SelectCriteriaAsync(CustomerSearchCriteria.Identification)">
+                                <i class="bi bi-card-text"></i>
+                                <span>@ViewMessages.CriteriaIdentification</span>
+                            </button>
+                            <button class="dropdown-item d-flex align-items-center gap-2 @(_selectedCriteria == CustomerSearchCriteria.Name ? "active" : "")"
+                                    type="button"
+                                    @onclick="() => SelectCriteriaAsync(CustomerSearchCriteria.Name)">
+                                <i class="bi bi-person-badge"></i>
+                                <span>@ViewMessages.CriteriaName</span>
+                            </button>
+                            <button class="dropdown-item d-flex align-items-center gap-2 @(_selectedCriteria == CustomerSearchCriteria.Id ? "active" : "")"
+                                    type="button"
+                                    @onclick="() => SelectCriteriaAsync(CustomerSearchCriteria.Id)">
+                                <i class="bi bi-key-fill"></i>
+                                <span>@ViewMessages.CriteriaCustomerId</span>
+                            </button>
+                        </div>
+
                         <input type="text"
                                class="form-control"
-                               placeholder="@ViewMessages.SearchPlaceholder"
+                               placeholder="@GetSearchPlaceholder()"
                                value="@_searchTerm"
                                @oninput="HandleSearchInput"
                                @onkeydown="HandleKeyDown" />
-                        <button class="btn btn-primary" type="button" @onclick="() => SearchAsync(1)" disabled="@_isLoading">
-                            @ViewMessages.SearchButton
+                        <button class="btn btn-primary px-3" type="button" @onclick="() => SearchAsync(1)" disabled="@_isLoading">
+                            <i class="bi bi-search me-1"></i>@ViewMessages.SearchButton
                         </button>
                         <button class="btn btn-outline-secondary" type="button" @onclick="ClearSearchAsync" disabled="@_isLoading">
                             @ViewMessages.ClearButton
@@ -49,7 +84,6 @@
                                         <th>ID</th>
                                         <th>@ViewMessages.CustomerNameLabel</th>
                                         <th>@ViewMessages.CustomerIdentificationLabel</th>
-                                        <th class="text-end">@ViewMessages.CustomerBalanceLabel</th>
                                         <th class="text-center" style="width: 120px;">@ViewMessages.ActionsLabel</th>
                                     </tr>
                                 </thead>
@@ -60,7 +94,6 @@
                                             <td class="fw-bold">@customer.Id</td>
                                             <td>@customer.Name</td>
                                             <td>@customer.Identification</td>
-                                            <td class="text-end font-monospace">@customer.CurrentBalance.ToString("C2")</td>
                                             <td class="text-center">
                                                 <button class="btn btn-sm btn-success px-3"
                                                         type="button"
@@ -118,9 +151,11 @@
     [Inject]
     public ISearchGateway SearchGateway { get; set; } = default!;
 
+    private CustomerSearchCriteria _selectedCriteria = CustomerSearchCriteria.All;
+    private bool _isDropdownOpen = false;
     private string _searchTerm = string.Empty;
     private int _currentPage = 1;
-    private const int PageSize = 10;
+    private const int PageSize = 5;
     private int _totalCount = 0;
     private int _totalPages = 1;
     private bool _isLoading = false;
@@ -136,6 +171,42 @@
             await SearchAsync(1);
         }
     }
+
+    private void ToggleCriteriaDropdown()
+    {
+        _isDropdownOpen = !_isDropdownOpen;
+    }
+
+    private async Task SelectCriteriaAsync(CustomerSearchCriteria criteria)
+    {
+        _selectedCriteria = criteria;
+        _isDropdownOpen = false;
+        await SearchAsync(1);
+    }
+
+    private string GetCriteriaLabel(CustomerSearchCriteria criteria) => criteria switch
+    {
+        CustomerSearchCriteria.Identification => ViewMessages.CriteriaIdentification,
+        CustomerSearchCriteria.Name => ViewMessages.CriteriaName,
+        CustomerSearchCriteria.Id => ViewMessages.CriteriaCustomerId,
+        _ => ViewMessages.CriteriaAll
+    };
+
+    private string GetCriteriaIcon(CustomerSearchCriteria criteria) => criteria switch
+    {
+        CustomerSearchCriteria.Identification => "bi bi-card-text",
+        CustomerSearchCriteria.Name => "bi bi-person-badge",
+        CustomerSearchCriteria.Id => "bi bi-key-fill",
+        _ => "bi bi-grid-fill"
+    };
+
+    private string GetSearchPlaceholder() => _selectedCriteria switch
+    {
+        CustomerSearchCriteria.Identification => "Buscar por cédula o RUC (ej. 1801234567)...",
+        CustomerSearchCriteria.Name => "Buscar por nombre comercial o razón social...",
+        CustomerSearchCriteria.Id => "Buscar por código de cliente (ej. ALFKI)...",
+        _ => "Buscar cliente por ID, nombre o cédula..."
+    };
 
     private void HandleSearchInput(ChangeEventArgs e)
     {
@@ -157,7 +228,7 @@
 
         try
         {
-            var result = await SearchGateway.SearchCustomersAsync(_searchTerm, _currentPage, PageSize);
+            var result = await SearchGateway.SearchCustomersAsync(_searchTerm, _selectedCriteria, _currentPage, PageSize);
             _customers = result.Items;
             _totalCount = result.TotalCount;
             _totalPages = (int)Math.Ceiling((double)_totalCount / PageSize);
@@ -199,6 +270,7 @@
 
     private async Task CloseAsync()
     {
+        _isDropdownOpen = false;
         IsOpen = false;
         await IsOpenChanged.InvokeAsync(false);
     }

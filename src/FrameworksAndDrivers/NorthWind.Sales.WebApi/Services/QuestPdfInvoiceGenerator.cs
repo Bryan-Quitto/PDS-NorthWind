@@ -3,6 +3,7 @@ using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using NorthWind.Sales.Backend.BusinessObjects.Interfaces.Services;
 using NorthWind.Sales.Entities.Dtos;
+using NorthWind.Sales.Entities;
 
 namespace NorthWind.Sales.WebApi.Services;
 
@@ -12,6 +13,8 @@ public class QuestPdfInvoiceGenerator : IInvoicePdfGenerator
     {
         // QuestPDF Community License for open-source / education
         QuestPDF.Settings.License = LicenseType.Community;
+        // QuestPDF 2025.1.0 aplicaba dos veces el offset de AlignRight/AlignCenter
+        // sobre Text(), desplazando columnas fuera de la tabla. Corregido en 2026.9.x.
     }
 
     public byte[] GenerateInvoicePdf(OrderInvoiceDto invoice)
@@ -23,7 +26,7 @@ public class QuestPdfInvoiceGenerator : IInvoicePdfGenerator
                 page.Size(PageSizes.A4);
                 page.Margin(35);
                 page.PageColor(Colors.White);
-                page.DefaultTextStyle(x => x.FontSize(10).FontFamily("Arial"));
+                page.DefaultTextStyle(x => x.FontSize(10).FontFamily("Lato"));
 
                 page.Header().Element(header => ComposeHeader(header, invoice));
                 page.Content().Element(content => ComposeContent(content, invoice));
@@ -53,8 +56,9 @@ public class QuestPdfInvoiceGenerator : IInvoicePdfGenerator
                 {
                     box.Item().AlignCenter().Text("FACTURA DE VENTA").Bold().FontSize(14).FontColor(Colors.Blue.Darken2);
                     box.Item().AlignCenter().Text($"No. {invoice.OrderId:D8}").Bold().FontSize(12);
-                    box.Item().PaddingTop(4).Text($"Fecha: {invoice.OrderDate:dd/MM/yyyy HH:mm}").FontSize(9);
-                    box.Item().Text("Estado: AUTORIZADA").FontSize(9).FontColor(Colors.Green.Darken2).Bold();
+                    var localOrderDate = invoice.OrderDate.ToEcuadorTime();
+                    box.Item().PaddingTop(4).Text($"Fecha: {localOrderDate:dd/MM/yyyy HH:mm}").FontSize(9);
+                    box.Item().Text("Estado: EN PRUEBAS").FontSize(9).FontColor(Colors.Orange.Darken2).Bold();
                 });
             });
         });
@@ -91,11 +95,11 @@ public class QuestPdfInvoiceGenerator : IInvoicePdfGenerator
             {
                 table.ColumnsDefinition(columns =>
                 {
-                    columns.ConstantColumn(50);
-                    columns.RelativeColumn(3);
-                    columns.RelativeColumn(1);
-                    columns.RelativeColumn(1);
-                    columns.RelativeColumn(1);
+                    columns.ConstantColumn(40);
+                    columns.RelativeColumn(4);
+                    columns.RelativeColumn(1.5f);
+                    columns.RelativeColumn(1.2f);
+                    columns.RelativeColumn(1.5f);
                 });
 
                 table.Header(header =>
@@ -120,31 +124,26 @@ public class QuestPdfInvoiceGenerator : IInvoicePdfGenerator
             column.Item().PaddingTop(15);
 
             // Resumen de Totales
-            column.Item().Row(row =>
+            column.Item().AlignRight().Width(240).Column(totalsCol =>
             {
-                row.RelativeItem(); // Espacio a la izquierda
-
-                row.ConstantItem(220).Column(totalsCol =>
+                totalsCol.Item().Row(r =>
                 {
-                    totalsCol.Item().Row(r =>
-                    {
-                        r.RelativeItem().Text("Subtotal:");
-                        r.RelativeItem().AlignRight().Text(invoice.Subtotal.ToString("C2"));
-                    });
+                    r.RelativeItem().Text("Subtotal:");
+                    r.RelativeItem().AlignRight().Text(invoice.Subtotal.ToString("C2"));
+                });
 
-                    totalsCol.Item().Row(r =>
-                    {
-                        r.RelativeItem().Text("IVA (15%):");
-                        r.RelativeItem().AlignRight().Text(invoice.Tax.ToString("C2"));
-                    });
+                totalsCol.Item().Row(r =>
+                {
+                    r.RelativeItem().Text("IVA (15%):");
+                    r.RelativeItem().AlignRight().Text(invoice.Tax.ToString("C2"));
+                });
 
-                    totalsCol.Item().PaddingTop(4).LineHorizontal(1);
+                totalsCol.Item().PaddingTop(4).LineHorizontal(1);
 
-                    totalsCol.Item().PaddingTop(4).Row(r =>
-                    {
-                        r.RelativeItem().Text("TOTAL:").Bold().FontSize(12).FontColor(Colors.Blue.Darken2);
-                        r.RelativeItem().AlignRight().Text(invoice.Total.ToString("C2")).Bold().FontSize(12).FontColor(Colors.Blue.Darken2);
-                    });
+                totalsCol.Item().PaddingTop(4).Row(r =>
+                {
+                    r.RelativeItem().Text("TOTAL:").Bold().FontSize(12).FontColor(Colors.Blue.Darken2);
+                    r.RelativeItem().AlignRight().Text(invoice.Total.ToString("C2")).Bold().FontSize(12).FontColor(Colors.Blue.Darken2);
                 });
             });
         });

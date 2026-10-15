@@ -5,5 +5,6 @@ public record OrderSummaryDto(
     DateTime OrderDate,
     string CustomerId,
     string CustomerName,
+    string CustomerIdentification,
     int ItemsCount,
     decimal Total);

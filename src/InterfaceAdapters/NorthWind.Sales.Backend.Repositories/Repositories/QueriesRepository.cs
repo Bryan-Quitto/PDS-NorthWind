@@ -1,4 +1,5 @@
 using NorthWind.Sales.Backend.Repositories.Interfaces;
+using NorthWind.Sales.Entities.Enums;
 
 namespace NorthWind.Sales.Backend.Repositories.Repositories;
 
@@ -12,12 +13,7 @@ public class QueriesRepository(INorthWindSalesQueriesDataContext context) : IQue
 
     public Task<decimal> GetCustomerCurrentBalanceAsync(string customerId, CancellationToken cancellationToken = default)
     {
-        var balance = context.Customers
-            .Where(c => c.Id == customerId)
-            .Select(c => c.CurrentBalance)
-            .FirstOrDefault();
-
-        return Task.FromResult(balance);
+        return Task.FromResult(0m);
     }
 
     public Task<IReadOnlyList<ProductUnitsInStock>> GetProductsUnitsInStockAsync(
@@ -35,6 +31,7 @@ public class QueriesRepository(INorthWindSalesQueriesDataContext context) : IQue
 
     public Task<PaginatedResultDto<CustomerDto>> SearchCustomersAsync(
         string? searchTerm,
+        CustomerSearchCriteria criteria,
         int pageNumber,
         int pageSize,
         CancellationToken cancellationToken = default)
@@ -43,8 +40,23 @@ public class QueriesRepository(INorthWindSalesQueriesDataContext context) : IQue
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
-            var trimmedTerm = searchTerm.Trim();
-            query = query.Where(c => c.Name.Contains(trimmedTerm) || c.Identification.Contains(trimmedTerm));
+            var tokens = searchTerm.Trim()
+                .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+            foreach (var token in tokens)
+            {
+                var currentToken = token;
+                query = criteria switch
+                {
+                    CustomerSearchCriteria.Identification => query.Where(c => c.Identification.Contains(currentToken)),
+                    CustomerSearchCriteria.Name => query.Where(c => c.Name.Contains(currentToken)),
+                    CustomerSearchCriteria.Id => query.Where(c => c.Id.Contains(currentToken)),
+                    _ => query.Where(c =>
+                        c.Id.Contains(currentToken) ||
+                        c.Name.Contains(currentToken) ||
+                        c.Identification.Contains(currentToken))
+                };
+            }
         }
 
         var totalCount = query.Count();
@@ -56,7 +68,7 @@ public class QueriesRepository(INorthWindSalesQueriesDataContext context) : IQue
             .OrderBy(c => c.Name)
             .Skip((normalizedPageNumber - 1) * normalizedPageSize)
             .Take(normalizedPageSize)
-            .Select(c => new CustomerDto(c.Id, c.Name, c.Identification, c.CurrentBalance))
+            .Select(c => new CustomerDto(c.Id, c.Name, c.Identification))
             .ToList();
 
         var result = new PaginatedResultDto<CustomerDto>(items, totalCount, normalizedPageNumber, normalizedPageSize);
@@ -65,6 +77,7 @@ public class QueriesRepository(INorthWindSalesQueriesDataContext context) : IQue
 
     public Task<PaginatedResultDto<ProductDto>> SearchProductsAsync(
         string? searchTerm,
+        ProductSearchCriteria criteria,
         int pageNumber,
         int pageSize,
         CancellationToken cancellationToken = default)
@@ -73,14 +86,22 @@ public class QueriesRepository(INorthWindSalesQueriesDataContext context) : IQue
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
-            var trimmedTerm = searchTerm.Trim();
-            if (int.TryParse(trimmedTerm, out var id))
+            var tokens = searchTerm.Trim()
+                .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+            foreach (var token in tokens)
             {
-                query = query.Where(p => p.Id == id || p.Name.Contains(trimmedTerm));
-            }
-            else
-            {
-                query = query.Where(p => p.Name.Contains(trimmedTerm));
+                var currentToken = token;
+                query = criteria switch
+                {
+                    ProductSearchCriteria.Id => int.TryParse(currentToken, out var pid)
+                        ? query.Where(p => p.Id == pid)
+                        : query.Where(p => false),
+                    ProductSearchCriteria.Name => query.Where(p => p.Name.Contains(currentToken)),
+                    _ => int.TryParse(currentToken, out var pidAll)
+                        ? query.Where(p => p.Id == pidAll || p.Name.Contains(currentToken))
+                        : query.Where(p => p.Name.Contains(currentToken))
+                };
             }
         }
 
@@ -147,6 +168,7 @@ public class QueriesRepository(INorthWindSalesQueriesDataContext context) : IQue
 
     public Task<PaginatedResultDto<OrderSummaryDto>> SearchOrdersAsync(
         string? searchTerm,
+        OrderSearchCriteria criteria,
         int pageNumber,
         int pageSize,
         CancellationToken cancellationToken = default)
@@ -163,14 +185,24 @@ public class QueriesRepository(INorthWindSalesQueriesDataContext context) : IQue
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
-            var trimmedTerm = searchTerm.Trim();
-            if (int.TryParse(trimmedTerm, out var parsedOrderId))
+            var tokens = searchTerm.Trim()
+                .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+            foreach (var token in tokens)
             {
-                joinedQuery = joinedQuery.Where(x => x.Order.Id == parsedOrderId || x.Customer.Name.Contains(trimmedTerm));
-            }
-            else
-            {
-                joinedQuery = joinedQuery.Where(x => x.Customer.Name.Contains(trimmedTerm) || x.Order.CustomerId.Contains(trimmedTerm));
+                var currentToken = token;
+                joinedQuery = criteria switch
+                {
+                    OrderSearchCriteria.OrderId => int.TryParse(currentToken, out var parsedOrderId)
+                        ? joinedQuery.Where(x => x.Order.Id == parsedOrderId)
+                        : joinedQuery.Where(x => false),
+                    OrderSearchCriteria.CustomerName => joinedQuery.Where(x => x.Customer.Name.Contains(currentToken)),
+                    OrderSearchCriteria.CustomerIdentification => joinedQuery.Where(x => x.Customer.Identification.Contains(currentToken)),
+                    OrderSearchCriteria.CustomerId => joinedQuery.Where(x => x.Order.CustomerId.Contains(currentToken)),
+                    _ => int.TryParse(currentToken, out var parsedIdAll)
+                        ? joinedQuery.Where(x => x.Order.Id == parsedIdAll || x.Customer.Name.Contains(currentToken) || x.Customer.Identification.Contains(currentToken) || x.Order.CustomerId.Contains(currentToken))
+                        : joinedQuery.Where(x => x.Customer.Name.Contains(currentToken) || x.Order.CustomerId.Contains(currentToken) || x.Customer.Identification.Contains(currentToken))
+                };
             }
         }
 
@@ -189,6 +221,7 @@ public class QueriesRepository(INorthWindSalesQueriesDataContext context) : IQue
                 x.Order.OrderDate,
                 x.Order.CustomerId,
                 CustomerName = x.Customer.Name,
+                CustomerIdentification = x.Customer.Identification,
                 x.Order.Total
             })
             .ToList();
@@ -205,6 +238,7 @@ public class QueriesRepository(INorthWindSalesQueriesDataContext context) : IQue
             x.OrderDate,
             x.CustomerId,
             x.CustomerName,
+            x.CustomerIdentification,
             countsByOrderId.TryGetValue(x.Id, out var count) ? count : 0,
             x.Total
         )).ToList();

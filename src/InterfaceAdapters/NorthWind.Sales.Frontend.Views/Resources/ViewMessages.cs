@@ -8,7 +8,6 @@ public static class ViewMessages
     public const string CustomerIdPlaceholder = "Seleccione un cliente";
     public const string CustomerNameLabel = "Nombre del Cliente";
     public const string CustomerIdentificationLabel = "Identificación / RUC / Cédula";
-    public const string CustomerBalanceLabel = "Saldo Actual";
     public const string SearchCustomerButton = "Buscar Cliente";
     public const string ShipAddressLabel = "Dirección de Envío";
     public const string ShipCityLabel = "Ciudad de Envío";
@@ -59,4 +58,12 @@ public static class ViewMessages
     public const string InvoiceDetailsHeader = "Detalle de Factura Electrónica";
     public const string InvoiceNotFound = "No se encontró la factura solicitada.";
     public const string ReconstructedInvoiceNotice = "Documento de Solo Lectura generado desde el historial de ventas.";
+
+    public const string CriteriaAll = "Todos los campos";
+    public const string CriteriaIdentification = "Cédula / RUC";
+    public const string CriteriaName = "Nombre / Razón Social";
+    public const string CriteriaCustomerId = "Código / ID Cliente";
+    public const string CriteriaProductId = "ID de Producto";
+    public const string CriteriaProductName = "Nombre de Producto";
+    public const string CriteriaInvoiceId = "No. Factura";
 }

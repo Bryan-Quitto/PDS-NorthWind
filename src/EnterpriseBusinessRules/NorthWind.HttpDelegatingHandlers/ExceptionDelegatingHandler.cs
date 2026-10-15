@@ -50,11 +50,31 @@ public class ExceptionDelegatingHandler : DelegatingHandler
         if (response.StatusCode == HttpStatusCode.InternalServerError)
         {
             var problemDetails = await response.Content.ReadFromJsonAsync<ProblemDetailsDto>(JsonOptions, cancellationToken);
-            var detail = problemDetails?.Detail ?? "Consulte al administrador.";
-            var title = problemDetails?.Title ?? "El servicio no se encuentra disponible.";
-            var message = !string.IsNullOrWhiteSpace(problemDetails?.Title) && !string.IsNullOrWhiteSpace(problemDetails?.Detail)
-                ? $"{title}\n{detail}"
-                : (problemDetails?.Detail ?? problemDetails?.Title ?? "El servicio no se encuentra disponible.");
+            var message = !string.IsNullOrWhiteSpace(problemDetails?.Detail) && !problemDetails.Detail.Contains("at System.", StringComparison.OrdinalIgnoreCase)
+                ? problemDetails.Detail
+                : "El servicio no se encuentra disponible, por favor contáctese con administración.";
+
+            var ex = new HttpRequestException(
+                message,
+                null,
+                response.StatusCode);
+
+            if (problemDetails?.Entries != null && problemDetails.Entries.Count > 0)
+            {
+                ex.Data["Errors"] = problemDetails.Entries;
+            }
+
+            throw ex;
+        }
+
+        if (response.StatusCode == HttpStatusCode.Conflict)
+        {
+            var problemDetails = await response.Content.ReadFromJsonAsync<ProblemDetailsDto>(JsonOptions, cancellationToken);
+            var detail = problemDetails?.Detail ?? "El registro está siendo modificado por otra transacción en curso. Por favor, espere a que finalice antes de intentar nuevamente.";
+            var title = problemDetails?.Title ?? "Conflicto de concurrencia";
+            var message = !string.IsNullOrWhiteSpace(problemDetails?.Detail)
+                ? problemDetails.Detail
+                : (!string.IsNullOrWhiteSpace(problemDetails?.Title) ? problemDetails.Title : "Conflicto de concurrencia detectado.");
 
             var ex = new HttpRequestException(
                 message,

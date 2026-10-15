@@ -11,14 +11,43 @@
                 </div>
                 <div class="modal-body">
                     <div class="input-group mb-3">
+                        <button class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center gap-1 px-3 shadow-none"
+                                type="button"
+                                @onclick="ToggleCriteriaDropdown"
+                                aria-expanded="@_isDropdownOpen">
+                            <i class="@GetCriteriaIcon(_selectedCriteria) text-success"></i>
+                            <span class="fw-semibold">@GetCriteriaLabel(_selectedCriteria)</span>
+                        </button>
+
+                        <div class="dropdown-menu shadow @(_isDropdownOpen ? "show" : "")" style="position: absolute; z-index: 1050; top: 100%; left: 0;">
+                            <button class="dropdown-item d-flex align-items-center gap-2 @(_selectedCriteria == ProductSearchCriteria.All ? "active" : "")"
+                                    type="button"
+                                    @onclick="() => SelectCriteriaAsync(ProductSearchCriteria.All)">
+                                <i class="bi bi-grid-fill"></i>
+                                <span>@ViewMessages.CriteriaAll</span>
+                            </button>
+                            <button class="dropdown-item d-flex align-items-center gap-2 @(_selectedCriteria == ProductSearchCriteria.Name ? "active" : "")"
+                                    type="button"
+                                    @onclick="() => SelectCriteriaAsync(ProductSearchCriteria.Name)">
+                                <i class="bi bi-tag-fill"></i>
+                                <span>@ViewMessages.CriteriaProductName</span>
+                            </button>
+                            <button class="dropdown-item d-flex align-items-center gap-2 @(_selectedCriteria == ProductSearchCriteria.Id ? "active" : "")"
+                                    type="button"
+                                    @onclick="() => SelectCriteriaAsync(ProductSearchCriteria.Id)">
+                                <i class="bi bi-hash"></i>
+                                <span>@ViewMessages.CriteriaProductId</span>
+                            </button>
+                        </div>
+
                         <input type="text"
                                class="form-control"
-                               placeholder="@ViewMessages.SearchPlaceholder"
+                               placeholder="@GetSearchPlaceholder()"
                                value="@_searchTerm"
                                @oninput="HandleSearchInput"
                                @onkeydown="HandleKeyDown" />
-                        <button class="btn btn-success" type="button" @onclick="() => SearchAsync(1)" disabled="@_isLoading">
-                            @ViewMessages.SearchButton
+                        <button class="btn btn-success px-3" type="button" @onclick="() => SearchAsync(1)" disabled="@_isLoading">
+                            <i class="bi bi-search me-1"></i>@ViewMessages.SearchButton
                         </button>
                         <button class="btn btn-outline-secondary" type="button" @onclick="ClearSearchAsync" disabled="@_isLoading">
                             @ViewMessages.ClearButton
@@ -56,19 +85,27 @@
                                 <tbody>
                                     @foreach (var product in _products)
                                     {
-                                        <tr>
+                                        var isExcluded = ExcludedProductId.HasValue && ExcludedProductId.Value == product.Id;
+                                        <tr style="@(isExcluded ? "cursor: not-allowed; opacity: 0.6;" : "")" title="@(isExcluded ? "No se puede seleccionar el mismo producto" : "")">
                                             <td class="fw-bold">@product.Id</td>
-                                            <td>@product.Name</td>
+                                            <td>
+                                                @product.Name
+                                                @if (isExcluded)
+                                                {
+                                                    <span class="badge bg-secondary ms-2">Producto actual</span>
+                                                }
+                                            </td>
                                             <td class="text-end font-monospace">@product.UnitPrice.ToString("C2")</td>
                                             <td class="text-center">
                                                 <span class="badge @(product.UnitsInStock > 0 ? "bg-success" : "bg-danger")">
                                                     @product.UnitsInStock
                                                 </span>
                                             </td>
-                                            <td class="text-center">
+                                            <td class="text-center" style="@(isExcluded ? "cursor: not-allowed;" : "")">
                                                 <button class="btn btn-sm btn-success px-3"
                                                         type="button"
-                                                        disabled="@(product.UnitsInStock <= 0)"
+                                                        style="@(isExcluded ? "cursor: not-allowed;" : "")"
+                                                        disabled="@(product.UnitsInStock <= 0 || isExcluded)"
                                                         @onclick="() => SelectProductAsync(product)">
                                                     @ViewMessages.SelectButton
                                                 </button>
@@ -120,9 +157,14 @@
     [Parameter]
     public EventCallback<ProductDto> OnProductSelected { get; set; }
 
+    [Parameter]
+    public int? ExcludedProductId { get; set; }
+
     [Inject]
     public ISearchGateway SearchGateway { get; set; } = default!;
 
+    private ProductSearchCriteria _selectedCriteria = ProductSearchCriteria.All;
+    private bool _isDropdownOpen = false;
     private string _searchTerm = string.Empty;
     private int _currentPage = 1;
     private const int PageSize = 10;
@@ -141,6 +183,39 @@
             await SearchAsync(1);
         }
     }
+
+    private void ToggleCriteriaDropdown()
+    {
+        _isDropdownOpen = !_isDropdownOpen;
+    }
+
+    private async Task SelectCriteriaAsync(ProductSearchCriteria criteria)
+    {
+        _selectedCriteria = criteria;
+        _isDropdownOpen = false;
+        await SearchAsync(1);
+    }
+
+    private string GetCriteriaLabel(ProductSearchCriteria criteria) => criteria switch
+    {
+        ProductSearchCriteria.Name => ViewMessages.CriteriaProductName,
+        ProductSearchCriteria.Id => ViewMessages.CriteriaProductId,
+        _ => ViewMessages.CriteriaAll
+    };
+
+    private string GetCriteriaIcon(ProductSearchCriteria criteria) => criteria switch
+    {
+        ProductSearchCriteria.Name => "bi bi-tag-fill",
+        ProductSearchCriteria.Id => "bi bi-hash",
+        _ => "bi bi-grid-fill"
+    };
+
+    private string GetSearchPlaceholder() => _selectedCriteria switch
+    {
+        ProductSearchCriteria.Name => "Buscar por nombre del producto (ej. Chai, Queso)...",
+        ProductSearchCriteria.Id => "Buscar por ID numérico de producto (ej. 1, 10)...",
+        _ => "Buscar por ID o nombre de producto..."
+    };
 
     private void HandleSearchInput(ChangeEventArgs e)
     {
@@ -162,7 +237,7 @@
 
         try
         {
-            var result = await SearchGateway.SearchProductsAsync(_searchTerm, _currentPage, PageSize);
+            var result = await SearchGateway.SearchProductsAsync(_searchTerm, _selectedCriteria, _currentPage, PageSize);
             _products = result.Items;
             _totalCount = result.TotalCount;
             _totalPages = (int)Math.Ceiling((double)_totalCount / PageSize);
@@ -204,6 +279,7 @@
 
     private async Task CloseAsync()
     {
+        _isDropdownOpen = false;
         IsOpen = false;
         await IsOpenChanged.InvokeAsync(false);
     }

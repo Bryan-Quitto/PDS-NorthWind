@@ -1,15 +1,19 @@
+using NorthWind.Sales.Entities.Enums;
+
 namespace NorthWind.Sales.Frontend.WebApiGateways;
 
 public class OrderInvoiceGateway(HttpClient client) : IOrderInvoiceGateway
 {
     public async Task<PaginatedResultDto<OrderSummaryDto>> SearchOrdersAsync(
         string? searchTerm,
+        OrderSearchCriteria criteria = OrderSearchCriteria.All,
         int pageNumber = 1,
         int pageSize = 10,
         CancellationToken cancellationToken = default)
     {
         var parameters = new List<string>
         {
+            $"criteria={Uri.EscapeDataString(criteria.ToString())}",
             $"pageNumber={pageNumber}",
             $"pageSize={pageSize}"
         };

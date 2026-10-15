@@ -11,6 +11,10 @@ public class CreateOrderDetailViewModelValidator : AbstractViewModelValidator<Cr
         RuleFor(d => d.UnitPrice)
             .GreaterThan(0, CreateOrderMessages.UnitPriceGreaterThanZero);
 
+        RuleFor(d => d.RawQuantity)
+            .NotEmpty(CreateOrderMessages.QuantityGreaterThanZero)
+            .Must(raw => short.TryParse(raw, out _), CreateOrderMessages.QuantityMustBeInteger);
+
         RuleFor(d => d.Quantity)
             .GreaterThan((short)0, CreateOrderMessages.QuantityGreaterThanZero);
     }
