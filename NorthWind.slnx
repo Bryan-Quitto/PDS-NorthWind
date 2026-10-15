@@ -43,4 +43,9 @@
     <Project Path="src/InterfaceAdapters/NorthWind.Sales.Frontend.Views/NorthWind.Sales.Frontend.Views.csproj" />
     <Project Path="src/InterfaceAdapters/NorthWind.Sales.Frontend.WebApiGateways/NorthWind.Sales.Frontend.WebApiGateways.csproj" />
   </Folder>
+  <Folder Name="/src/" />
+  <Folder Name="/src/EnterpriseBusinessRules/" />
+  <Folder Name="/tests/">
+    <Project Path="tests/NorthWind.Membership.Entities.UnitTests/NorthWind.Membership.Entities.UnitTests.csproj" />
+  </Folder>
 </Solution>

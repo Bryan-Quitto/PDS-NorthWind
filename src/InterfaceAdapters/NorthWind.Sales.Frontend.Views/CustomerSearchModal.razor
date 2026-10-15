@@ -50,6 +50,10 @@
                                class="form-control"
                                placeholder="@GetSearchPlaceholder()"
                                value="@_searchTerm"
+                               maxlength="@GetSearchMaxLength()"
+                               inputmode="@GetSearchInputMode()"
+                               onkeypress="@GetSearchKeyPress()"
+                               onpaste="@GetSearchPaste()"
                                @oninput="HandleSearchInput"
                                @onkeydown="HandleKeyDown" />
                         <button class="btn btn-primary px-3" type="button" @onclick="() => SearchAsync(1)" disabled="@_isLoading">
@@ -181,6 +185,7 @@
     {
         _selectedCriteria = criteria;
         _isDropdownOpen = false;
+        _searchTerm = string.Empty;
         await SearchAsync(1);
     }
 
@@ -208,9 +213,42 @@
         _ => "Buscar cliente por ID, nombre o cédula..."
     };
 
+    private int? GetSearchMaxLength() => _selectedCriteria switch
+    {
+        CustomerSearchCriteria.Identification => 10,
+        CustomerSearchCriteria.Id => 5,
+        CustomerSearchCriteria.Name => 50,
+        _ => 50
+    };
+
+    private string GetSearchInputMode() => _selectedCriteria switch
+    {
+        CustomerSearchCriteria.Identification => "numeric",
+        _ => "text"
+    };
+
+    private string? GetSearchKeyPress() => _selectedCriteria switch
+    {
+        CustomerSearchCriteria.Identification => "return event.key.length > 1 || /^\\d$/.test(event.key)",
+        CustomerSearchCriteria.Id => "return event.key.length > 1 || /^[a-zA-Z]$/.test(event.key)",
+        _ => null
+    };
+
+    private string? GetSearchPaste() => _selectedCriteria switch
+    {
+        CustomerSearchCriteria.Identification => "const text = (event.clipboardData || window.clipboardData).getData('text'); if (!/^\\d*$/.test(text)) { event.preventDefault(); }",
+        CustomerSearchCriteria.Id => "const text = (event.clipboardData || window.clipboardData).getData('text'); if (!/^[a-zA-Z]*$/.test(text)) { event.preventDefault(); }",
+        _ => null
+    };
+
     private void HandleSearchInput(ChangeEventArgs e)
     {
-        _searchTerm = e.Value?.ToString() ?? string.Empty;
+        var val = e.Value?.ToString() ?? string.Empty;
+        if (_selectedCriteria == CustomerSearchCriteria.Id)
+        {
+            val = val.ToUpperInvariant();
+        }
+        _searchTerm = val;
     }
 
     private async Task HandleKeyDown(KeyboardEventArgs e)

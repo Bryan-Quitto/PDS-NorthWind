@@ -1,4 +1,5 @@
 using NorthWind.Membership.Entities.Resources;
+using NorthWind.Membership.Entities.Validators;
 using NorthWind.Validation.Entities.Abstractions;
 using NorthWind.Validation.Entities.Interfaces;
 
@@ -10,14 +11,20 @@ public class UserRegistrationViewModelValidator : AbstractModelValidator<UserReg
         : base(validationService)
     {
         RuleFor(u => u.FirstName)
-            .NotEmpty(MembershipMessages.FirstNameRequired);
+            .NotEmpty(MembershipMessages.FirstNameRequired)
+            .Length(1, 100, MembershipMessages.FirstNameMaxLength)
+            .Must(UserNameRulesValidator.IsValidFormat, MembershipMessages.FirstNameInvalidFormat);
 
         RuleFor(u => u.LastName)
-            .NotEmpty(MembershipMessages.LastNameRequired);
+            .NotEmpty(MembershipMessages.LastNameRequired)
+            .Length(1, 100, MembershipMessages.LastNameMaxLength)
+            .Must(UserNameRulesValidator.IsValidFormat, MembershipMessages.LastNameInvalidFormat);
 
         RuleFor(u => u.Email)
             .NotEmpty(MembershipMessages.EmailRequired)
-            .Must(email => !string.IsNullOrWhiteSpace(email) && email.Contains('@') && email.Contains('.'), MembershipMessages.EmailInvalid);
+            .Length(1, 256, MembershipMessages.EmailMaxLength)
+            .Must(UserEmailRulesValidator.HasNoConsecutiveDots, MembershipMessages.EmailConsecutiveDots)
+            .Must(UserEmailRulesValidator.IsValidFormat, MembershipMessages.EmailInvalid);
 
         RuleFor(u => u.Password)
             .NotEmpty(MembershipMessages.PasswordRequired)

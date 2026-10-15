@@ -62,6 +62,9 @@
   <data name="QuantityMustBeInteger" xml:space="preserve">
     <value>La cantidad debe ser un número entero.</value>
   </data>
+  <data name="QuantityExceedsMax" xml:space="preserve">
+    <value>La cantidad no puede superar los 32767 artículos.</value>
+  </data>
   <data name="CustomerIdentificationRequired" xml:space="preserve">
     <value>La identificación del cliente es requerida.</value>
   </data>

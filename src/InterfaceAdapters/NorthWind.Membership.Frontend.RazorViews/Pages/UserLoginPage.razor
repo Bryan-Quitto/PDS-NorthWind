@@ -29,13 +29,25 @@
 
                         <div class="mb-3">
                             <label class="form-label" for="email">Correo Electrónico</label>
-                            <InputText id="email" type="email" class="form-control" @bind-Value="ViewModel.Email" placeholder="correo@ejemplo.com" />
+                            <InputText id="email"
+                                       type="email"
+                                       class="form-control"
+                                       maxlength="256"
+                                       onkeypress="return event.key.length > 1 || /^[a-zA-Z0-9._\x40\-]$/.test(event.key)"
+                                       onpaste="const text = (event.clipboardData || window.clipboardData).getData('text'); if (!/^[a-zA-Z0-9._\x40\-]*$/.test(text)) { event.preventDefault(); }"
+                                       @bind-Value="ViewModel.Email"
+                                       placeholder="correo@ejemplo.com" />
                             <ValidationMessage For="() => ViewModel.Email" class="text-danger small" />
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label" for="password">Contraseña</label>
-                            <InputText id="password" type="password" class="form-control" @bind-Value="ViewModel.Password" placeholder="Contraseña" />
+                            <InputText id="password"
+                                       type="password"
+                                       class="form-control"
+                                       maxlength="100"
+                                       @bind-Value="ViewModel.Password"
+                                       placeholder="Contraseña" />
                             <ValidationMessage For="() => ViewModel.Password" class="text-danger small" />
                         </div>
 

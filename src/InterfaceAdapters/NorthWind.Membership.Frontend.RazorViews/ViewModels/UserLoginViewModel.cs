@@ -9,7 +9,14 @@ public class UserLoginViewModel(
     ITokenStorage tokenStorage,
     JWTAuthenticationStateProvider authStateProvider)
 {
-    public string Email { get; set; } = string.Empty;
+    private string _email = string.Empty;
+
+    public string Email
+    {
+        get => _email;
+        set => _email = System.Text.RegularExpressions.Regex.Replace(value ?? string.Empty, @"[^a-zA-Z0-9._@-]", "");
+    }
+
     public string Password { get; set; } = string.Empty;
 
     public List<string> Errors { get; private set; } = [];
@@ -22,7 +29,7 @@ public class UserLoginViewModel(
 
         var credentials = new UserCredentialsDto
         {
-            Email = Email,
+            Email = Email.Trim(),
             Password = Password
         };
 

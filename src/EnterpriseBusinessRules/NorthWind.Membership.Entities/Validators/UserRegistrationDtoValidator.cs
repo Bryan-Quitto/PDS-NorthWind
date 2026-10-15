@@ -14,17 +14,41 @@ public class UserRegistrationDtoValidator : IModelValidator<UserRegistrationDto>
         {
             errors.Add(new ValidationError(nameof(model.FirstName), MembershipMessages.FirstNameRequired));
         }
+        else if (model.FirstName.Length > 100)
+        {
+            errors.Add(new ValidationError(nameof(model.FirstName), MembershipMessages.FirstNameMaxLength));
+        }
+        else if (!UserNameRulesValidator.IsValidFormat(model.FirstName))
+        {
+            errors.Add(new ValidationError(nameof(model.FirstName), MembershipMessages.FirstNameInvalidFormat));
+        }
 
         if (string.IsNullOrWhiteSpace(model.LastName))
         {
             errors.Add(new ValidationError(nameof(model.LastName), MembershipMessages.LastNameRequired));
+        }
+        else if (model.LastName.Length > 100)
+        {
+            errors.Add(new ValidationError(nameof(model.LastName), MembershipMessages.LastNameMaxLength));
+        }
+        else if (!UserNameRulesValidator.IsValidFormat(model.LastName))
+        {
+            errors.Add(new ValidationError(nameof(model.LastName), MembershipMessages.LastNameInvalidFormat));
         }
 
         if (string.IsNullOrWhiteSpace(model.Email))
         {
             errors.Add(new ValidationError(nameof(model.Email), MembershipMessages.EmailRequired));
         }
-        else if (!model.Email.Contains('@') || !model.Email.Contains('.'))
+        else if (model.Email.Length > 256)
+        {
+            errors.Add(new ValidationError(nameof(model.Email), MembershipMessages.EmailMaxLength));
+        }
+        else if (!UserEmailRulesValidator.HasNoConsecutiveDots(model.Email))
+        {
+            errors.Add(new ValidationError(nameof(model.Email), MembershipMessages.EmailConsecutiveDots));
+        }
+        else if (!UserEmailRulesValidator.IsValidFormat(model.Email))
         {
             errors.Add(new ValidationError(nameof(model.Email), MembershipMessages.EmailInvalid));
         }

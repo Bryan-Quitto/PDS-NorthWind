@@ -6,9 +6,28 @@ namespace NorthWind.Membership.Frontend.RazorViews.ViewModels;
 
 public class UserRegistrationViewModel(MembershipGateway gateway)
 {
-    public string FirstName { get; set; } = string.Empty;
-    public string LastName { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
+    private string _firstName = string.Empty;
+    private string _lastName = string.Empty;
+    private string _email = string.Empty;
+
+    public string FirstName
+    {
+        get => _firstName;
+        set => _firstName = System.Text.RegularExpressions.Regex.Replace(value ?? string.Empty, @"[^\p{L}\s\-']", "");
+    }
+
+    public string LastName
+    {
+        get => _lastName;
+        set => _lastName = System.Text.RegularExpressions.Regex.Replace(value ?? string.Empty, @"[^\p{L}\s\-']", "");
+    }
+
+    public string Email
+    {
+        get => _email;
+        set => _email = System.Text.RegularExpressions.Regex.Replace(value ?? string.Empty, @"[^a-zA-Z0-9._@-]", "");
+    }
+
     public string Password { get; set; } = string.Empty;
     public string PasswordConfirmation { get; set; } = string.Empty;
 
@@ -22,11 +41,12 @@ public class UserRegistrationViewModel(MembershipGateway gateway)
         Errors.Clear();
         IsSuccess = false;
 
+        // Limpieza real (Trim) al mapear el DTO para persistencia limpia
         var dto = new UserRegistrationDto
         {
-            FirstName = FirstName,
-            LastName = LastName,
-            Email = Email,
+            FirstName = FirstName.Trim(),
+            LastName = LastName.Trim(),
+            Email = Email.Trim(),
             Password = Password
         };
 

@@ -67,6 +67,10 @@
                                            class="form-control"
                                            placeholder="@GetSearchPlaceholder()"
                                            value="@_searchTerm"
+                                           maxlength="@GetSearchMaxLength()"
+                                           inputmode="@GetSearchInputMode()"
+                                           onkeypress="@GetSearchKeyPress()"
+                                           onpaste="@GetSearchPaste()"
                                            @oninput="HandleSearchInput"
                                            @onkeydown="HandleKeyDown" />
                                     <button class="btn btn-primary px-3" type="button" @onclick="() => SearchOrdersAsync(1)" disabled="@_isLoading">
@@ -335,6 +339,7 @@
     {
         _selectedCriteria = criteria;
         _isDropdownOpen = false;
+        _searchTerm = string.Empty;
         await SearchOrdersAsync(1);
     }
 
@@ -365,9 +370,46 @@
         _ => "Buscar por No. Factura, Nombre, Cédula o ID de Cliente..."
     };
 
+    private int? GetSearchMaxLength() => _selectedCriteria switch
+    {
+        OrderSearchCriteria.OrderId => 10,
+        OrderSearchCriteria.CustomerIdentification => 10,
+        OrderSearchCriteria.CustomerId => 5,
+        OrderSearchCriteria.CustomerName => 50,
+        _ => 50
+    };
+
+    private string GetSearchInputMode() => _selectedCriteria switch
+    {
+        OrderSearchCriteria.OrderId => "numeric",
+        OrderSearchCriteria.CustomerIdentification => "numeric",
+        _ => "text"
+    };
+
+    private string? GetSearchKeyPress() => _selectedCriteria switch
+    {
+        OrderSearchCriteria.OrderId => "return event.key.length > 1 || /^\\d$/.test(event.key)",
+        OrderSearchCriteria.CustomerIdentification => "return event.key.length > 1 || /^\\d$/.test(event.key)",
+        OrderSearchCriteria.CustomerId => "return event.key.length > 1 || /^[a-zA-Z]$/.test(event.key)",
+        _ => null
+    };
+
+    private string? GetSearchPaste() => _selectedCriteria switch
+    {
+        OrderSearchCriteria.OrderId => "const text = (event.clipboardData || window.clipboardData).getData('text'); if (!/^\\d*$/.test(text)) { event.preventDefault(); }",
+        OrderSearchCriteria.CustomerIdentification => "const text = (event.clipboardData || window.clipboardData).getData('text'); if (!/^\\d*$/.test(text)) { event.preventDefault(); }",
+        OrderSearchCriteria.CustomerId => "const text = (event.clipboardData || window.clipboardData).getData('text'); if (!/^[a-zA-Z]*$/.test(text)) { event.preventDefault(); }",
+        _ => null
+    };
+
     private void HandleSearchInput(ChangeEventArgs e)
     {
-        _searchTerm = e.Value?.ToString() ?? string.Empty;
+        var val = e.Value?.ToString() ?? string.Empty;
+        if (_selectedCriteria == OrderSearchCriteria.CustomerId)
+        {
+            val = val.ToUpperInvariant();
+        }
+        _searchTerm = val;
     }
 
     private async Task HandleKeyDown(KeyboardEventArgs e)

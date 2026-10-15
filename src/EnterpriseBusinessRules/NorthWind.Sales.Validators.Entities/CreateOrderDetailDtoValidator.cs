@@ -14,6 +14,7 @@ public class CreateOrderDetailDtoValidator : AbstractModelValidator<CreateOrderD
             .GreaterThan(0, CreateOrderMessages.UnitPriceGreaterThanZero);
 
         RuleFor(d => d.Quantity)
-            .GreaterThan((short)0, CreateOrderMessages.QuantityGreaterThanZero);
+            .GreaterThan((short)0, CreateOrderMessages.QuantityGreaterThanZero)
+            .LessThanOrEqualTo(short.MaxValue, CreateOrderMessages.QuantityExceedsMax);
     }
 }

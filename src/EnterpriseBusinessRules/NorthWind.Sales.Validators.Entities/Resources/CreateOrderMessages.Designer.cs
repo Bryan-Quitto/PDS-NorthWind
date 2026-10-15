@@ -40,6 +40,7 @@ public class CreateOrderMessages
     public static string UnitPriceGreaterThanZero => ResourceManager.GetString("UnitPriceGreaterThanZero", resourceCulture) ?? "El precio unitario debe ser mayor a cero.";
     public static string QuantityGreaterThanZero => ResourceManager.GetString("QuantityGreaterThanZero", resourceCulture) ?? "La cantidad debe ser mayor a cero.";
     public static string QuantityMustBeInteger => ResourceManager.GetString("QuantityMustBeInteger", resourceCulture) ?? "La cantidad debe ser un número entero.";
+    public static string QuantityExceedsMax => ResourceManager.GetString("QuantityExceedsMax", resourceCulture) ?? "La cantidad no puede superar los 32767 artículos.";
     public static string CustomerIdentificationRequired => ResourceManager.GetString("CustomerIdentificationRequired", resourceCulture) ?? "La identificación del cliente es requerida.";
     public static string CustomerIdentificationInvalid => ResourceManager.GetString("CustomerIdentificationInvalid", resourceCulture) ?? "La cédula ingresada no es válida para Ecuador.";
     public static string ShipAddressMaxLength => ResourceManager.GetString("ShipAddressMaxLength", resourceCulture) ?? "La dirección de envío no puede exceder los 60 caracteres.";

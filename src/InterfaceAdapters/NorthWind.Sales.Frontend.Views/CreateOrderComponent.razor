@@ -97,19 +97,34 @@
 
                             <div class="col-md-2">
                                 <label for="shipCity" class="form-label fw-bold">@ViewMessages.ShipCityLabel</label>
-                                <InputText id="shipCity" class="form-control" maxlength="15" @bind-Value="Model.ShipCity" />
+                                <InputText id="shipCity"
+                                           class="form-control"
+                                           maxlength="15"
+                                           onkeypress="return event.key.length > 1 || /^[\p{L}\s\-']$/u.test(event.key)"
+                                           onpaste="const text = (event.clipboardData || window.clipboardData).getData('text'); if (!/^[\p{L}\s\-']*$/u.test(text)) { event.preventDefault(); }"
+                                           @bind-Value="Model.ShipCity" />
                                 <ValidationMessage For="@(() => Model.ShipCity)" class="text-danger small mt-1" />
                             </div>
 
                             <div class="col-md-2">
                                 <label for="shipCountry" class="form-label fw-bold">@ViewMessages.ShipCountryLabel</label>
-                                <InputText id="shipCountry" class="form-control" maxlength="15" @bind-Value="Model.ShipCountry" />
+                                <InputText id="shipCountry"
+                                           class="form-control"
+                                           maxlength="15"
+                                           onkeypress="return event.key.length > 1 || /^[\p{L}\s\-']$/u.test(event.key)"
+                                           onpaste="const text = (event.clipboardData || window.clipboardData).getData('text'); if (!/^[\p{L}\s\-']*$/u.test(text)) { event.preventDefault(); }"
+                                           @bind-Value="Model.ShipCountry" />
                                 <ValidationMessage For="@(() => Model.ShipCountry)" class="text-danger small mt-1" />
                             </div>
 
                             <div class="col-md-2">
                                 <label for="shipPostalCode" class="form-label fw-bold">@ViewMessages.ShipPostalCodeLabel</label>
-                                <InputText id="shipPostalCode" class="form-control" maxlength="10" @bind-Value="Model.ShipPostalCode" />
+                                <InputText id="shipPostalCode"
+                                           class="form-control"
+                                           maxlength="10"
+                                           onkeypress="return event.key.length > 1 || /^[a-zA-Z0-9\s\-]$/.test(event.key)"
+                                           onpaste="const text = (event.clipboardData || window.clipboardData).getData('text'); if (!/^[a-zA-Z0-9\s\-]*$/.test(text)) { event.preventDefault(); }"
+                                           @bind-Value="Model.ShipPostalCode" />
                                 <ValidationMessage For="@(() => Model.ShipPostalCode)" class="text-danger small mt-1" />
                             </div>
                         </div>
@@ -173,9 +188,11 @@
                                                     <input type="number"
                                                            step="1"
                                                            min="1"
+                                                           max="32767"
                                                            class="form-control form-control-sm text-center mx-auto"
                                                            style="max-width: 90px;"
                                                            value="@detail.RawQuantity"
+                                                           onkeypress="return event.key.length > 1 || /^\d$/.test(event.key)"
                                                            @onchange="(e) => OnQuantityChanged(detail, e)" />
                                                     <ValidationMessage For="@(() => detail.RawQuantity)" class="text-danger small" />
                                                     <ValidationMessage For="@(() => detail.Quantity)" class="text-danger small" />
@@ -506,9 +523,9 @@
     {
         var rawVal = e.Value?.ToString() ?? string.Empty;
 
-        if (short.TryParse(rawVal, out var qty))
+        if (int.TryParse(rawVal, out var intQty) && intQty > 0 && intQty <= short.MaxValue)
         {
-            Model.UpdateQuantity(detail, qty, rawVal);
+            Model.UpdateQuantity(detail, (short)intQty, rawVal);
         }
         else
         {
