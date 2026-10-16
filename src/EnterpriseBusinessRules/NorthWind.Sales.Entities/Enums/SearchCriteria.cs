@@ -5,7 +5,9 @@ public enum CustomerSearchCriteria
     All = 0,
     Identification = 1,
     Name = 2,
-    Id = 3
+    Id = 3,
+    BusinessName = 4,
+    LastName = 5
 }
 
 public enum ProductSearchCriteria

@@ -48,13 +48,24 @@ public class QueriesRepository(INorthWindSalesQueriesDataContext context) : IQue
                 var currentToken = token;
                 query = criteria switch
                 {
-                    CustomerSearchCriteria.Identification => query.Where(c => c.Identification.Contains(currentToken)),
-                    CustomerSearchCriteria.Name => query.Where(c => c.Name.Contains(currentToken)),
-                    CustomerSearchCriteria.Id => query.Where(c => c.Id.Contains(currentToken)),
+                    CustomerSearchCriteria.Identification => query.Where(c => c.Identification.StartsWith(currentToken)),
+                    CustomerSearchCriteria.BusinessName => query.Where(c => c.BusinessName != null && c.BusinessName.StartsWith(currentToken)),
+                    CustomerSearchCriteria.LastName => query.Where(c => c.LastName != null && c.LastName.StartsWith(currentToken)),
+                    CustomerSearchCriteria.Name => query.Where(c =>
+                        (c.CustomerType == CustomerType.Natural && (
+                            (c.LastName != null && c.LastName.StartsWith(currentToken)) ||
+                            (c.FirstName != null && c.FirstName.StartsWith(currentToken)))) ||
+                        (c.CustomerType == CustomerType.Legal && (
+                            (c.BusinessName != null && c.BusinessName.StartsWith(currentToken)) ||
+                            (c.TradeName != null && c.TradeName.StartsWith(currentToken))))),
+                    CustomerSearchCriteria.Id => query.Where(c => c.Id.StartsWith(currentToken)),
                     _ => query.Where(c =>
-                        c.Id.Contains(currentToken) ||
-                        c.Name.Contains(currentToken) ||
-                        c.Identification.Contains(currentToken))
+                        c.Id.StartsWith(currentToken) ||
+                        c.Identification.StartsWith(currentToken) ||
+                        (c.BusinessName != null && c.BusinessName.StartsWith(currentToken)) ||
+                        (c.TradeName != null && c.TradeName.StartsWith(currentToken)) ||
+                        (c.LastName != null && c.LastName.StartsWith(currentToken)) ||
+                        (c.FirstName != null && c.FirstName.StartsWith(currentToken)))
                 };
             }
         }
@@ -68,7 +79,17 @@ public class QueriesRepository(INorthWindSalesQueriesDataContext context) : IQue
             .OrderBy(c => c.Name)
             .Skip((normalizedPageNumber - 1) * normalizedPageSize)
             .Take(normalizedPageSize)
-            .Select(c => new CustomerDto(c.Id, c.Name, c.Identification))
+            .Select(c => new CustomerDto(
+                c.Id,
+                c.Name,
+                c.Identification,
+                c.CustomerType,
+                c.FirstName,
+                c.SecondName,
+                c.LastName,
+                c.SecondLastName,
+                c.BusinessName,
+                c.TradeName))
             .ToList();
 
         var result = new PaginatedResultDto<CustomerDto>(items, totalCount, normalizedPageNumber, normalizedPageSize);

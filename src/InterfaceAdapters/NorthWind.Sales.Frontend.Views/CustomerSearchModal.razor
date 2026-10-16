@@ -38,6 +38,18 @@
                                 <i class="bi bi-person-badge"></i>
                                 <span>@ViewMessages.CriteriaName</span>
                             </button>
+                            <button class="dropdown-item d-flex align-items-center gap-2 @(_selectedCriteria == CustomerSearchCriteria.LastName ? "active" : "")"
+                                    type="button"
+                                    @onclick="() => SelectCriteriaAsync(CustomerSearchCriteria.LastName)">
+                                <i class="bi bi-person"></i>
+                                <span>Apellido</span>
+                            </button>
+                            <button class="dropdown-item d-flex align-items-center gap-2 @(_selectedCriteria == CustomerSearchCriteria.BusinessName ? "active" : "")"
+                                    type="button"
+                                    @onclick="() => SelectCriteriaAsync(CustomerSearchCriteria.BusinessName)">
+                                <i class="bi bi-building"></i>
+                                <span>Razón Social</span>
+                            </button>
                             <button class="dropdown-item d-flex align-items-center gap-2 @(_selectedCriteria == CustomerSearchCriteria.Id ? "active" : "")"
                                     type="button"
                                     @onclick="() => SelectCriteriaAsync(CustomerSearchCriteria.Id)">
@@ -96,7 +108,21 @@
                                     {
                                         <tr>
                                             <td class="fw-bold">@customer.Id</td>
-                                            <td>@customer.Name</td>
+                                            <td>
+                                                <div>@customer.Name</div>
+                                                @if (!string.IsNullOrWhiteSpace(customer.TradeName))
+                                                {
+                                                    <div class="text-muted small"><i class="bi bi-shop me-1"></i>Comercial: @customer.TradeName</div>
+                                                }
+                                                @if (customer.CustomerType == CustomerType.Legal)
+                                                {
+                                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle small">Jurídica</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle small">Natural</span>
+                                                }
+                                            </td>
                                             <td>@customer.Identification</td>
                                             <td class="text-center">
                                                 <button class="btn btn-sm btn-success px-3"
@@ -193,6 +219,8 @@
     {
         CustomerSearchCriteria.Identification => ViewMessages.CriteriaIdentification,
         CustomerSearchCriteria.Name => ViewMessages.CriteriaName,
+        CustomerSearchCriteria.LastName => "Apellido",
+        CustomerSearchCriteria.BusinessName => "Razón Social",
         CustomerSearchCriteria.Id => ViewMessages.CriteriaCustomerId,
         _ => ViewMessages.CriteriaAll
     };
@@ -201,22 +229,28 @@
     {
         CustomerSearchCriteria.Identification => "bi bi-card-text",
         CustomerSearchCriteria.Name => "bi bi-person-badge",
+        CustomerSearchCriteria.LastName => "bi bi-person",
+        CustomerSearchCriteria.BusinessName => "bi bi-building",
         CustomerSearchCriteria.Id => "bi bi-key-fill",
         _ => "bi bi-grid-fill"
     };
 
     private string GetSearchPlaceholder() => _selectedCriteria switch
     {
-        CustomerSearchCriteria.Identification => "Buscar por cédula o RUC (ej. 1801234567)...",
-        CustomerSearchCriteria.Name => "Buscar por nombre comercial o razón social...",
+        CustomerSearchCriteria.Identification => "Buscar por cédula (10 dígitos) o RUC (13 dígitos)...",
+        CustomerSearchCriteria.Name => "Buscar por nombre, apellido o razón social...",
+        CustomerSearchCriteria.LastName => "Buscar por primer apellido...",
+        CustomerSearchCriteria.BusinessName => "Buscar por razón social...",
         CustomerSearchCriteria.Id => "Buscar por código de cliente (ej. ALFKI)...",
-        _ => "Buscar cliente por ID, nombre o cédula..."
+        _ => "Buscar cliente por ID, nombres, razón social o identificación..."
     };
 
     private int? GetSearchMaxLength() => _selectedCriteria switch
     {
-        CustomerSearchCriteria.Identification => 10,
+        CustomerSearchCriteria.Identification => 13,
         CustomerSearchCriteria.Id => 5,
+        CustomerSearchCriteria.LastName => 50,
+        CustomerSearchCriteria.BusinessName => 150,
         CustomerSearchCriteria.Name => 50,
         _ => 50
     };

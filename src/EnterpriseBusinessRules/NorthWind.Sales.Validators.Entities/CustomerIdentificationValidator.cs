@@ -10,7 +10,7 @@ public class CustomerIdentificationValidator : AbstractModelValidator<string>
     {
         RuleFor(id => id)
             .NotEmpty(CreateOrderMessages.CustomerIdentificationRequired)
-            .Length(10, CreateOrderMessages.CustomerIdentificationInvalid)
+            .Must(id => id != null && (id.Length == 10 || id.Length == 13), CreateOrderMessages.CustomerIdentificationInvalid)
             .Must(id => EcuadorianIdentificationValidator.IsValid(id), CreateOrderMessages.CustomerIdentificationInvalid);
     }
 }

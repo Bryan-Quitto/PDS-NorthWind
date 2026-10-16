@@ -102,51 +102,123 @@ namespace NorthWind.Sales.Backend.DataContexts.EFCore.Migrations.NorthWindSales
                         .HasColumnType("nchar(5)")
                         .IsFixedLength();
 
-                    b.Property<string>("Identification")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nchar(10)")
-                        .IsFixedLength();
+                    b.Property<string>("BusinessName")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
+                    b.Property<int>("CustomerType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FirstName")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("Identification")
+                        .IsRequired()
+                        .HasMaxLength(13)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(13)");
+
+                    b.Property<string>("LastName")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)")
+                        .HasComputedColumnSql("CASE WHEN [CustomerType] = 2 THEN ISNULL([BusinessName], '') ELSE CONCAT_WS(' ', [LastName], [SecondLastName], [FirstName], [SecondName]) END", true);
+
+                    b.Property<string>("SecondLastName")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("SecondName")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("TradeName")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
                     b.HasKey("Id");
 
-                    b.ToTable("Customers", (string)null);
+                    b.HasIndex("BusinessName")
+                        .HasDatabaseName("IX_Customers_BusinessName");
+
+                    b.HasIndex("FirstName")
+                        .HasDatabaseName("IX_Customers_FirstName");
+
+                    b.HasIndex("Identification")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Customers_Identification");
+
+                    b.HasIndex("TradeName")
+                        .HasDatabaseName("IX_Customers_TradeName");
+
+                    b.HasIndex("LastName", "FirstName")
+                        .HasDatabaseName("IX_Customers_LastName_FirstName");
+
+                    b.ToTable("Customers", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_Customers_CustomerType_Integrity", "([CustomerType] = 1 AND [FirstName] IS NOT NULL AND [LastName] IS NOT NULL AND [BusinessName] IS NULL) OR ([CustomerType] = 2 AND [BusinessName] IS NOT NULL AND [FirstName] IS NULL AND [LastName] IS NULL AND [SecondName] IS NULL AND [SecondLastName] IS NULL)");
+
+                            t.HasCheckConstraint("CK_Customers_Identification_Format", "([CustomerType] = 1 AND (LEN([Identification]) = 10 OR (LEN([Identification]) = 13 AND RIGHT([Identification], 3) <> '000'))) OR ([CustomerType] = 2 AND LEN([Identification]) = 13 AND RIGHT([Identification], 3) <> '000')");
+                        });
 
                     b.HasData(
                         new
                         {
                             Id = "ALFKI",
-                            Identification = "0102030405",
-                            Name = "Alfreds Futterkiste"
+                            BusinessName = "ALFREDS FUTTERKISTE CIA. LTDA.",
+                            CustomerType = 2,
+                            Identification = "1790011674001",
+                            Name = "",
+                            TradeName = "Alfreds Futterkiste"
                         },
                         new
                         {
                             Id = "ANATR",
-                            Identification = "0203040506",
-                            Name = "Ana Trujillo Emparedados y helados"
+                            CustomerType = 1,
+                            FirstName = "Ana",
+                            Identification = "0102030409",
+                            LastName = "Trujillo",
+                            Name = "",
+                            SecondLastName = "Pérez",
+                            SecondName = "María",
+                            TradeName = "Emparedados y helados"
                         },
                         new
                         {
                             Id = "ANTON",
-                            Identification = "0304050607",
-                            Name = "Antonio Moreno Taqueria"
+                            CustomerType = 1,
+                            FirstName = "Antonio",
+                            Identification = "1803456782",
+                            LastName = "Moreno",
+                            Name = "",
+                            SecondLastName = "Taquería",
+                            SecondName = "José",
+                            TradeName = "Taquería El Paso"
                         },
                         new
                         {
                             Id = "AROUT",
-                            Identification = "0405060708",
-                            Name = "Around the Horn"
+                            CustomerType = 1,
+                            FirstName = "Thomas",
+                            Identification = "1712345676001",
+                            LastName = "Hardy",
+                            Name = "",
+                            TradeName = "Around the Horn"
                         },
                         new
                         {
                             Id = "BERGS",
-                            Identification = "0506070809",
-                            Name = "Berglunds snabbkop"
+                            BusinessName = "BERGLUNDS SNABBKOP S.A.",
+                            CustomerType = 2,
+                            Identification = "1790087657001",
+                            Name = "",
+                            TradeName = "Berglunds Market"
                         });
                 });
 
