@@ -35,6 +35,24 @@ public class UserRegistrationViewModel(MembershipGateway gateway)
     public bool IsSuccess { get; private set; }
     public bool IsLoading { get; private set; }
 
+    public bool HasPendingData =>
+        !string.IsNullOrWhiteSpace(FirstName) ||
+        !string.IsNullOrWhiteSpace(LastName) ||
+        !string.IsNullOrWhiteSpace(Email) ||
+        !string.IsNullOrWhiteSpace(Password) ||
+        !string.IsNullOrWhiteSpace(PasswordConfirmation);
+
+    public void Reset()
+    {
+        FirstName = string.Empty;
+        LastName = string.Empty;
+        Email = string.Empty;
+        Password = string.Empty;
+        PasswordConfirmation = string.Empty;
+        Errors.Clear();
+        IsSuccess = false;
+    }
+
     public async Task<bool> RegisterAsync()
     {
         IsLoading = true;

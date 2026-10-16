@@ -113,7 +113,9 @@
 
                     <div class="mt-3 text-center">
                         <span class="text-muted">¿Ya tienes cuenta? </span>
-                        <a href="/user/login">Iniciar Sesión</a>
+                        <button type="button" class="btn btn-link p-0 text-decoration-none" @onclick="HandleNavigateToLogin">
+                            Iniciar Sesión
+                        </button>
                     </div>
                 </div>
             </div>
@@ -121,9 +123,65 @@
     </div>
 </div>
 
+<!-- MODAL DE CONFIRMACIÓN: DESCARTAR CAMBIOS AL SALIR -->
+@if (_isAbandonConfirmModalOpen)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.5);">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i> Confirmar Salida
+                    </h5>
+                    <button type="button" class="btn-close" @onclick="CloseAbandonConfirmModal"></button>
+                </div>
+                <div class="modal-body py-4">
+                    <p class="mb-0 fs-6">
+                        Tiene datos ingresados en el formulario de registro que no han sido guardados. Si sale ahora, se perderán todos los cambios. ¿Desea continuar al inicio de sesión?
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseAbandonConfirmModal">
+                        Permanecer aquí
+                    </button>
+                    <button type="button" class="btn btn-warning" @onclick="ConfirmAbandonAndNavigate">
+                        <i class="bi bi-box-arrow-right me-1"></i> Sí, Salir al Login
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
+    private bool _isAbandonConfirmModalOpen;
+
     private async Task HandleSubmit()
     {
         await ViewModel.RegisterAsync();
+    }
+
+    private void HandleNavigateToLogin()
+    {
+        if (ViewModel.HasPendingData && !ViewModel.IsSuccess)
+        {
+            _isAbandonConfirmModalOpen = true;
+        }
+        else
+        {
+            Navigation.NavigateTo("/user/login");
+        }
+    }
+
+    private void CloseAbandonConfirmModal()
+    {
+        _isAbandonConfirmModalOpen = false;
+    }
+
+    private void ConfirmAbandonAndNavigate()
+    {
+        _isAbandonConfirmModalOpen = false;
+        ViewModel.Reset();
+        Navigation.NavigateTo("/user/login");
     }
 }
