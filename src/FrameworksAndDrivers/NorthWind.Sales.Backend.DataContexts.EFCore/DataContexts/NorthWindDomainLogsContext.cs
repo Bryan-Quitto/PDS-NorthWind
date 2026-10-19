@@ -28,8 +28,13 @@ public class NorthWindDomainLogsContext(IOptions<DBOptions> dbOptions) : DbConte
 
     public async Task AddLogAsync(DomainLog log, CancellationToken cancellationToken = default)
     {
-        await DomainLogs.AddAsync(log, cancellationToken);
-        await GuardDBContext.SaveChangesAsync(this, cancellationToken);
+        using (new System.Transactions.TransactionScope(
+            System.Transactions.TransactionScopeOption.Suppress,
+            System.Transactions.TransactionScopeAsyncFlowOption.Enabled))
+        {
+            await DomainLogs.AddAsync(log, cancellationToken);
+            await GuardDBContext.SaveChangesAsync(this, cancellationToken);
+        }
     }
 
     public new async Task SaveChangesAsync(CancellationToken cancellationToken = default)

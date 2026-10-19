@@ -10,7 +10,10 @@ public class DomainTransaction : IDomainTransaction, IDisposable
     public void BeginTransaction()
     {
 #pragma warning disable CA1416
-        TransactionManager.ImplicitDistributedTransactions = true;
+        if (OperatingSystem.IsWindows())
+        {
+            TransactionManager.ImplicitDistributedTransactions = true;
+        }
 #pragma warning restore CA1416
 
         var options = new TransactionOptions
