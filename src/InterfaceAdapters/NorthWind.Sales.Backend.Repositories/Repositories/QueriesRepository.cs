@@ -49,15 +49,15 @@ public class QueriesRepository(INorthWindSalesQueriesDataContext context) : IQue
                 query = criteria switch
                 {
                     CustomerSearchCriteria.Identification => query.Where(c => c.Identification.StartsWith(currentToken)),
-                    CustomerSearchCriteria.BusinessName => query.Where(c => c.BusinessName != null && c.BusinessName.StartsWith(currentToken)),
-                    CustomerSearchCriteria.LastName => query.Where(c => c.LastName != null && c.LastName.StartsWith(currentToken)),
+                    CustomerSearchCriteria.BusinessName => query.Where(c => c.CustomerType == CustomerType.Legal && c.BusinessName != null && c.BusinessName.StartsWith(currentToken)),
+                    CustomerSearchCriteria.TradeName => query.Where(c => c.CustomerType == CustomerType.Legal && c.TradeName != null && c.TradeName.StartsWith(currentToken)),
+                    CustomerSearchCriteria.LastName => query.Where(c => c.CustomerType == CustomerType.Natural && c.LastName != null && c.LastName.StartsWith(currentToken)),
                     CustomerSearchCriteria.Name => query.Where(c =>
-                        (c.CustomerType == CustomerType.Natural && (
+                        c.CustomerType == CustomerType.Natural && (
                             (c.LastName != null && c.LastName.StartsWith(currentToken)) ||
-                            (c.FirstName != null && c.FirstName.StartsWith(currentToken)))) ||
-                        (c.CustomerType == CustomerType.Legal && (
-                            (c.BusinessName != null && c.BusinessName.StartsWith(currentToken)) ||
-                            (c.TradeName != null && c.TradeName.StartsWith(currentToken))))),
+                            (c.SecondLastName != null && c.SecondLastName.StartsWith(currentToken)) ||
+                            (c.FirstName != null && c.FirstName.StartsWith(currentToken)) ||
+                            (c.SecondName != null && c.SecondName.StartsWith(currentToken)))),
                     CustomerSearchCriteria.Id => query.Where(c => c.Id.StartsWith(currentToken)),
                     _ => query.Where(c =>
                         c.Id.StartsWith(currentToken) ||

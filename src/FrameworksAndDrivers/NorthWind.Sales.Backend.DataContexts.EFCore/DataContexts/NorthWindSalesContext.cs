@@ -25,7 +25,7 @@ public class NorthWindSalesContext(IOptions<DBOptions> dbOptions) : DbContext,
     {
         if (!optionsBuilder.IsConfigured)
         {
-            optionsBuilder.UseSqlServer("Server=localhost;Database=NorthWindDB;Trusted_Connection=True;TrustServerCertificate=True;");
+            optionsBuilder.UseSqlServer(options.ConnectionString);
         }
     }
 

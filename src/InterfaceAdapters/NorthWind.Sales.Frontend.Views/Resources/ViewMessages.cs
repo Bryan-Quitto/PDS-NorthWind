@@ -62,6 +62,10 @@ public static class ViewMessages
     public const string CriteriaAll = "Todos los campos";
     public const string CriteriaIdentification = "Cédula / RUC";
     public const string CriteriaName = "Nombre / Razón Social";
+    public const string CriteriaFullName = "Nombres y Apellidos";
+    public const string CriteriaLastName = "Primer Apellido";
+    public const string CriteriaBusinessName = "Razón Social";
+    public const string CriteriaTradeName = "Nombre Comercial";
     public const string CriteriaCustomerId = "Código / ID Cliente";
     public const string CriteriaProductId = "ID de Producto";
     public const string CriteriaProductName = "Nombre de Producto";

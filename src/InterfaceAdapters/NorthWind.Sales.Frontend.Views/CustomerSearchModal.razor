@@ -19,7 +19,8 @@
                             <span class="fw-semibold">@GetCriteriaLabel(_selectedCriteria)</span>
                         </button>
 
-                        <div class="dropdown-menu shadow @(_isDropdownOpen ? "show" : "")" style="position: absolute; z-index: 1050; top: 100%; left: 0;">
+                        <div class="dropdown-menu shadow @(_isDropdownOpen ? "show" : "")" style="position: absolute; z-index: 1050; top: 100%; left: 0; min-width: 240px;">
+                            <h6 class="dropdown-header text-uppercase fw-bold text-muted small pb-1">Búsqueda General</h6>
                             <button class="dropdown-item d-flex align-items-center gap-2 @(_selectedCriteria == CustomerSearchCriteria.All ? "active" : "")"
                                     type="button"
                                     @onclick="() => SelectCriteriaAsync(CustomerSearchCriteria.All)">
@@ -32,29 +33,41 @@
                                 <i class="bi bi-card-text"></i>
                                 <span>@ViewMessages.CriteriaIdentification</span>
                             </button>
-                            <button class="dropdown-item d-flex align-items-center gap-2 @(_selectedCriteria == CustomerSearchCriteria.Name ? "active" : "")"
-                                    type="button"
-                                    @onclick="() => SelectCriteriaAsync(CustomerSearchCriteria.Name)">
-                                <i class="bi bi-person-badge"></i>
-                                <span>@ViewMessages.CriteriaName</span>
-                            </button>
-                            <button class="dropdown-item d-flex align-items-center gap-2 @(_selectedCriteria == CustomerSearchCriteria.LastName ? "active" : "")"
-                                    type="button"
-                                    @onclick="() => SelectCriteriaAsync(CustomerSearchCriteria.LastName)">
-                                <i class="bi bi-person"></i>
-                                <span>Apellido</span>
-                            </button>
-                            <button class="dropdown-item d-flex align-items-center gap-2 @(_selectedCriteria == CustomerSearchCriteria.BusinessName ? "active" : "")"
-                                    type="button"
-                                    @onclick="() => SelectCriteriaAsync(CustomerSearchCriteria.BusinessName)">
-                                <i class="bi bi-building"></i>
-                                <span>Razón Social</span>
-                            </button>
                             <button class="dropdown-item d-flex align-items-center gap-2 @(_selectedCriteria == CustomerSearchCriteria.Id ? "active" : "")"
                                     type="button"
                                     @onclick="() => SelectCriteriaAsync(CustomerSearchCriteria.Id)">
                                 <i class="bi bi-key-fill"></i>
                                 <span>@ViewMessages.CriteriaCustomerId</span>
+                            </button>
+
+                            <li><hr class="dropdown-divider my-1"></li>
+                            <h6 class="dropdown-header text-uppercase fw-bold text-muted small pb-1">Personas Naturales</h6>
+                            <button class="dropdown-item d-flex align-items-center gap-2 @(_selectedCriteria == CustomerSearchCriteria.Name ? "active" : "")"
+                                    type="button"
+                                    @onclick="() => SelectCriteriaAsync(CustomerSearchCriteria.Name)">
+                                <i class="bi bi-person-badge"></i>
+                                <span>@ViewMessages.CriteriaFullName</span>
+                            </button>
+                            <button class="dropdown-item d-flex align-items-center gap-2 @(_selectedCriteria == CustomerSearchCriteria.LastName ? "active" : "")"
+                                    type="button"
+                                    @onclick="() => SelectCriteriaAsync(CustomerSearchCriteria.LastName)">
+                                <i class="bi bi-person"></i>
+                                <span>@ViewMessages.CriteriaLastName</span>
+                            </button>
+
+                            <li><hr class="dropdown-divider my-1"></li>
+                            <h6 class="dropdown-header text-uppercase fw-bold text-muted small pb-1">Empresas / Jurídicas</h6>
+                            <button class="dropdown-item d-flex align-items-center gap-2 @(_selectedCriteria == CustomerSearchCriteria.BusinessName ? "active" : "")"
+                                    type="button"
+                                    @onclick="() => SelectCriteriaAsync(CustomerSearchCriteria.BusinessName)">
+                                <i class="bi bi-building"></i>
+                                <span>@ViewMessages.CriteriaBusinessName</span>
+                            </button>
+                            <button class="dropdown-item d-flex align-items-center gap-2 @(_selectedCriteria == CustomerSearchCriteria.TradeName ? "active" : "")"
+                                    type="button"
+                                    @onclick="() => SelectCriteriaAsync(CustomerSearchCriteria.TradeName)">
+                                <i class="bi bi-shop"></i>
+                                <span>@ViewMessages.CriteriaTradeName</span>
                             </button>
                         </div>
 
@@ -218,9 +231,10 @@
     private string GetCriteriaLabel(CustomerSearchCriteria criteria) => criteria switch
     {
         CustomerSearchCriteria.Identification => ViewMessages.CriteriaIdentification,
-        CustomerSearchCriteria.Name => ViewMessages.CriteriaName,
-        CustomerSearchCriteria.LastName => "Apellido",
-        CustomerSearchCriteria.BusinessName => "Razón Social",
+        CustomerSearchCriteria.Name => ViewMessages.CriteriaFullName,
+        CustomerSearchCriteria.LastName => ViewMessages.CriteriaLastName,
+        CustomerSearchCriteria.BusinessName => ViewMessages.CriteriaBusinessName,
+        CustomerSearchCriteria.TradeName => ViewMessages.CriteriaTradeName,
         CustomerSearchCriteria.Id => ViewMessages.CriteriaCustomerId,
         _ => ViewMessages.CriteriaAll
     };
@@ -231,6 +245,7 @@
         CustomerSearchCriteria.Name => "bi bi-person-badge",
         CustomerSearchCriteria.LastName => "bi bi-person",
         CustomerSearchCriteria.BusinessName => "bi bi-building",
+        CustomerSearchCriteria.TradeName => "bi bi-shop",
         CustomerSearchCriteria.Id => "bi bi-key-fill",
         _ => "bi bi-grid-fill"
     };
@@ -238,9 +253,10 @@
     private string GetSearchPlaceholder() => _selectedCriteria switch
     {
         CustomerSearchCriteria.Identification => "Buscar por cédula (10 dígitos) o RUC (13 dígitos)...",
-        CustomerSearchCriteria.Name => "Buscar por nombre, apellido o razón social...",
+        CustomerSearchCriteria.Name => "Buscar por nombres y apellidos (ej. Ana Trujillo)...",
         CustomerSearchCriteria.LastName => "Buscar por primer apellido...",
-        CustomerSearchCriteria.BusinessName => "Buscar por razón social...",
+        CustomerSearchCriteria.BusinessName => "Buscar por razón social de la empresa...",
+        CustomerSearchCriteria.TradeName => "Buscar por nombre comercial (ej. Taquería El Paso)...",
         CustomerSearchCriteria.Id => "Buscar por código de cliente (ej. ALFKI)...",
         _ => "Buscar cliente por ID, nombres, razón social o identificación..."
     };
@@ -251,6 +267,7 @@
         CustomerSearchCriteria.Id => 5,
         CustomerSearchCriteria.LastName => 50,
         CustomerSearchCriteria.BusinessName => 150,
+        CustomerSearchCriteria.TradeName => 150,
         CustomerSearchCriteria.Name => 50,
         _ => 50
     };
