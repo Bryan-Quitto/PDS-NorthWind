@@ -1,4 +1,5 @@
 @namespace NorthWind.RazorComponents
+@implements IDisposable
 
 <div class="input-group @Class">
     @if (Criteria.Count > 0)
@@ -52,7 +53,6 @@
            maxlength="@MaxLength"
            @oninput="HandleSearchInputAsync"
            @onkeydown="HandleKeyDownAsync"
-           disabled="@IsSearching"
            aria-label="@Placeholder" />
 
     @if (ShowClearButton && !string.IsNullOrEmpty(SearchText))

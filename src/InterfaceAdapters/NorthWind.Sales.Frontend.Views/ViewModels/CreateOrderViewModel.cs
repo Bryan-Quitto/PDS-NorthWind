@@ -31,13 +31,14 @@ public class CreateOrderViewModel
         CustomerIdentification = customer.Identification;
     }
 
-    public void AddOrUpdateDetail(int productId, string productName, decimal unitPrice, short quantity = 1)
+    public void AddOrUpdateDetail(int productId, string productName, decimal unitPrice, short quantity = 1, short unitsInStock = 0)
     {
         var existing = OrderDetails.FirstOrDefault(d => d.ProductId == productId);
         if (existing != null)
         {
             existing.Quantity = (short)(existing.Quantity + quantity);
             existing.RawQuantity = existing.Quantity.ToString();
+            existing.UnitsInStock = unitsInStock;
         }
         else
         {
@@ -47,12 +48,13 @@ public class CreateOrderViewModel
                 ProductName = productName,
                 UnitPrice = unitPrice,
                 Quantity = quantity,
-                RawQuantity = quantity.ToString()
+                RawQuantity = quantity.ToString(),
+                UnitsInStock = unitsInStock
             });
         }
     }
 
-    public void ReplaceDetail(int oldProductId, int newProductId, string newProductName, decimal newUnitPrice)
+    public void ReplaceDetail(int oldProductId, int newProductId, string newProductName, decimal newUnitPrice, short newUnitsInStock = 0)
     {
         var existingIndex = OrderDetails.FindIndex(d => d.ProductId == oldProductId);
         if (existingIndex >= 0)
@@ -63,6 +65,7 @@ public class CreateOrderViewModel
                 // Si el producto nuevo ya existía en otra fila, sumamos 1 a esa fila y quitamos la vieja
                 OrderDetails[alreadyInListIndex].Quantity = (short)(OrderDetails[alreadyInListIndex].Quantity + 1);
                 OrderDetails[alreadyInListIndex].RawQuantity = OrderDetails[alreadyInListIndex].Quantity.ToString();
+                OrderDetails[alreadyInListIndex].UnitsInStock = newUnitsInStock;
                 OrderDetails.RemoveAt(existingIndex);
             }
             else
@@ -73,7 +76,8 @@ public class CreateOrderViewModel
                     ProductName = newProductName,
                     UnitPrice = newUnitPrice,
                     Quantity = 1,
-                    RawQuantity = "1"
+                    RawQuantity = "1",
+                    UnitsInStock = newUnitsInStock
                 };
             }
         }

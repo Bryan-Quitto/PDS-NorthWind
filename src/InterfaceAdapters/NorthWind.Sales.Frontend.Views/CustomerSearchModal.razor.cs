@@ -1,7 +1,8 @@
 namespace NorthWind.Sales.Frontend.Views;
 
-public partial class CustomerSearchModal : ComponentBase
+public partial class CustomerSearchModal : ComponentBase, IDisposable
 {
+    private CancellationTokenSource? _searchCts;
     [Parameter]
     public bool IsOpen { get; set; }
 
@@ -47,8 +48,10 @@ public partial class CustomerSearchModal : ComponentBase
         if (Enum.TryParse<CustomerSearchCriteria>(key, out var criteria))
         {
             _selectedCriteria = criteria;
-            _searchTerm = string.Empty;
-            await SearchAsync(1);
+            if (string.IsNullOrEmpty(_searchTerm))
+            {
+                await SearchAsync(1);
+            }
         }
     }
 
@@ -76,6 +79,11 @@ public partial class CustomerSearchModal : ComponentBase
 
     public async Task SearchAsync(int pageNumber)
     {
+        _searchCts?.Cancel();
+        _searchCts?.Dispose();
+        _searchCts = new CancellationTokenSource();
+        var cancellationToken = _searchCts.Token;
+
         _isLoading = true;
         _currentPage = pageNumber;
 
@@ -85,16 +93,30 @@ public partial class CustomerSearchModal : ComponentBase
                 ? _searchTerm.ToUpperInvariant()
                 : _searchTerm;
 
-            var result = await SearchGateway.SearchCustomersAsync(term, _selectedCriteria, _currentPage, PageSize);
+            var result = await SearchGateway.SearchCustomersAsync(term, _selectedCriteria, _currentPage, PageSize, cancellationToken);
             _customers = result.Items;
             _totalCount = result.TotalCount;
             _totalPages = (int)Math.Ceiling((double)_totalCount / PageSize);
             if (_totalPages < 1) _totalPages = 1;
         }
+        catch (OperationCanceledException)
+        {
+            // Búsqueda cancelada por una solicitud más reciente; ignorar limpiamente sin romper UI
+        }
         finally
         {
-            _isLoading = false;
+            if (_searchCts?.Token == cancellationToken)
+            {
+                _isLoading = false;
+            }
         }
+    }
+
+    public void Dispose()
+    {
+        _searchCts?.Cancel();
+        _searchCts?.Dispose();
+        _searchCts = null;
     }
 
     protected async Task ClearSearchAsync()

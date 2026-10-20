@@ -1,7 +1,8 @@
 namespace NorthWind.Sales.Frontend.Views;
 
-public partial class InvoiceSearchPage : ComponentBase
+public partial class InvoiceSearchPage : ComponentBase, IDisposable
 {
+    private CancellationTokenSource? _searchCts;
     [Parameter]
     public int? OrderId { get; set; }
 
@@ -51,8 +52,10 @@ public partial class InvoiceSearchPage : ComponentBase
         if (Enum.TryParse<OrderSearchCriteria>(key, out var criteria))
         {
             _selectedCriteria = criteria;
-            _searchTerm = string.Empty;
-            await SearchOrdersAsync(1);
+            if (string.IsNullOrEmpty(_searchTerm))
+            {
+                await SearchOrdersAsync(1);
+            }
         }
     }
 
@@ -76,6 +79,11 @@ public partial class InvoiceSearchPage : ComponentBase
 
     public async Task SearchOrdersAsync(int pageNumber)
     {
+        _searchCts?.Cancel();
+        _searchCts?.Dispose();
+        _searchCts = new CancellationTokenSource();
+        var cancellationToken = _searchCts.Token;
+
         _isLoading = true;
         _currentException = null;
         _currentPage = pageNumber;
@@ -86,11 +94,15 @@ public partial class InvoiceSearchPage : ComponentBase
                 ? _searchTerm.ToUpperInvariant()
                 : _searchTerm;
 
-            var result = await InvoiceGateway.SearchOrdersAsync(term, _selectedCriteria, _currentPage, PageSize);
+            var result = await InvoiceGateway.SearchOrdersAsync(term, _selectedCriteria, _currentPage, PageSize, cancellationToken);
             _orders = result.Items;
             _totalCount = result.TotalCount;
             _totalPages = (int)Math.Ceiling((double)_totalCount / PageSize);
             if (_totalPages < 1) _totalPages = 1;
+        }
+        catch (OperationCanceledException)
+        {
+            // Búsqueda cancelada por una solicitud más reciente; ignorar limpiamente sin mostrar error ni romper la UI
         }
         catch (Exception ex)
         {
@@ -98,8 +110,18 @@ public partial class InvoiceSearchPage : ComponentBase
         }
         finally
         {
-            _isLoading = false;
+            if (_searchCts?.Token == cancellationToken)
+            {
+                _isLoading = false;
+            }
         }
+    }
+
+    public void Dispose()
+    {
+        _searchCts?.Cancel();
+        _searchCts?.Dispose();
+        _searchCts = null;
     }
 
     protected async Task ClearSearchAsync()

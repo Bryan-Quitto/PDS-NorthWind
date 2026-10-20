@@ -1,6 +1,7 @@
 @page "/invoices"
 @page "/invoices/{OrderId:int}"
 @attribute [Authorize]
+@implements IDisposable
 
 <PageTitle>@ViewMessages.InvoiceSearchTitle - NorthWind</PageTitle>
 

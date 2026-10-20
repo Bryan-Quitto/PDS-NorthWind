@@ -32,11 +32,12 @@
                     <thead class="table-light">
                         <tr>
                             <th style="width: 8%;">@ViewMessages.ProductIdLabel</th>
-                            <th style="width: 37%;">@ViewMessages.ProductNameLabel</th>
-                            <th style="width: 15%;" class="text-center">@ViewMessages.QuantityLabel</th>
-                            <th style="width: 15%;" class="text-end">@ViewMessages.UnitPriceLabel</th>
-                            <th style="width: 15%;" class="text-end">@ViewMessages.SubtotalLineLabel</th>
-                            <th style="width: 10%;" class="text-center">@ViewMessages.ActionsLabel</th>
+                            <th style="width: 32%;">@ViewMessages.ProductNameLabel</th>
+                            <th style="width: 10%;" class="text-center">@ViewMessages.StockLabel</th>
+                            <th style="width: 12%;" class="text-center">@ViewMessages.QuantityLabel</th>
+                            <th style="width: 13%;" class="text-end">@ViewMessages.UnitPriceLabel</th>
+                            <th style="width: 13%;" class="text-end">@ViewMessages.SubtotalLineLabel</th>
+                            <th style="width: 12%;" class="text-center">@ViewMessages.ActionsLabel</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -51,6 +52,11 @@
                                            class="form-control form-control-sm bg-light"
                                            value="@detail.ProductName"
                                            readonly />
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge @(detail.UnitsInStock > 0 ? "bg-success" : "bg-danger") font-monospace">
+                                        @detail.UnitsInStock
+                                    </span>
                                 </td>
                                 <td class="text-center">
                                     <input type="number"

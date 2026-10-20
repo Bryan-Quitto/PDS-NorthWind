@@ -85,12 +85,12 @@ public partial class CreateOrderComponent : ComponentBase
         ClearServerErrors();
         if (_replacingProductId.HasValue)
         {
-            Model.ReplaceDetail(_replacingProductId.Value, product.Id, product.Name, product.UnitPrice);
+            Model.ReplaceDetail(_replacingProductId.Value, product.Id, product.Name, product.UnitPrice, product.UnitsInStock);
             _replacingProductId = null;
         }
         else
         {
-            Model.AddOrUpdateDetail(product.Id, product.Name, product.UnitPrice, 1);
+            Model.AddOrUpdateDetail(product.Id, product.Name, product.UnitPrice, 1, product.UnitsInStock);
         }
 
         _editContext.NotifyValidationStateChanged();

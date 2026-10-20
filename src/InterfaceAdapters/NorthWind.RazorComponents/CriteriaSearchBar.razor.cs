@@ -3,9 +3,16 @@ namespace NorthWind.RazorComponents;
 /// <summary>
 /// Componente reutilizable de barra de búsqueda con selector de criterios, botón de limpiar y soporte para tecla Enter.
 /// </summary>
-public partial class CriteriaSearchBar : ComponentBase
+public partial class CriteriaSearchBar : ComponentBase, IDisposable
 {
     private bool _isDropdownOpen;
+    private CancellationTokenSource? _debounceCts;
+
+    /// <summary>
+    /// Tiempo de espera (debounce) en milisegundos para disparar la búsqueda automática al escribir.
+    /// </summary>
+    [Parameter]
+    public int DebounceDelayMs { get; set; } = 300;
 
     /// <summary>
     /// Lista de criterios de búsqueda disponibles.
@@ -113,21 +120,45 @@ public partial class CriteriaSearchBar : ComponentBase
 
     /// <summary>
     /// Selecciona un nuevo criterio y cierra el menú desplegable.
+    /// Si hay texto de búsqueda, actualiza los resultados dinámicamente con el nuevo criterio.
     /// </summary>
     protected async Task SelectCriterionAsync(string key)
     {
         SelectedCriterionKey = key;
         _isDropdownOpen = false;
         await SelectedCriterionKeyChanged.InvokeAsync(key);
+
+        if (!string.IsNullOrEmpty(SearchText))
+        {
+            CancelDebounce();
+            await OnSearch.InvokeAsync();
+        }
     }
 
     /// <summary>
-    /// Maneja los cambios de texto en tiempo real.
+    /// Maneja los cambios de texto en tiempo real con debounce para búsqueda dinámica.
     /// </summary>
     protected async Task HandleSearchInputAsync(ChangeEventArgs e)
     {
         SearchText = e.Value?.ToString() ?? string.Empty;
         await SearchTextChanged.InvokeAsync(SearchText);
+
+        CancelDebounce();
+        _debounceCts = new CancellationTokenSource();
+        var token = _debounceCts.Token;
+
+        try
+        {
+            await Task.Delay(DebounceDelayMs, token);
+            _isDropdownOpen = false;
+            await OnSearch.InvokeAsync();
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (ObjectDisposedException)
+        {
+        }
     }
 
     /// <summary>
@@ -137,6 +168,7 @@ public partial class CriteriaSearchBar : ComponentBase
     {
         if (e.Key == "Enter")
         {
+            CancelDebounce();
             await HandleSearchAsync();
         }
         else if (e.Key == "Escape" && _isDropdownOpen)
@@ -150,6 +182,7 @@ public partial class CriteriaSearchBar : ComponentBase
     /// </summary>
     protected async Task HandleSearchAsync()
     {
+        CancelDebounce();
         if (IsSearching) return;
 
         _isDropdownOpen = false;
@@ -161,11 +194,31 @@ public partial class CriteriaSearchBar : ComponentBase
     /// </summary>
     protected async Task HandleClearAsync()
     {
-        if (IsSearching) return;
-
+        CancelDebounce();
         SearchText = string.Empty;
         _isDropdownOpen = false;
         await SearchTextChanged.InvokeAsync(string.Empty);
         await OnClear.InvokeAsync();
+    }
+
+    private void CancelDebounce()
+    {
+        try
+        {
+            _debounceCts?.Cancel();
+            _debounceCts?.Dispose();
+        }
+        catch (ObjectDisposedException)
+        {
+        }
+        finally
+        {
+            _debounceCts = null;
+        }
+    }
+
+    public void Dispose()
+    {
+        CancelDebounce();
     }
 }

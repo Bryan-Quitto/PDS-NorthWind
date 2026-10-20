@@ -11,6 +11,8 @@ public class CreateOrderDetailViewModel
     public short Quantity { get; set; } = 1;
     public string RawQuantity { get; set; } = "1";
 
+    public short UnitsInStock { get; set; }
+
     public decimal LineTotal => UnitPrice * Quantity;
 
     public CreateOrderDetailDto ToDto() => new(ProductId, UnitPrice, Quantity);
