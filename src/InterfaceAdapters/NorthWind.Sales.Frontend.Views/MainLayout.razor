@@ -2,16 +2,16 @@
 
 <div class="page">
     <div class="sidebar">
-        <NavMenu Title="NorthWind Sales">
-            <NavMenuItem Href="" Match="NavLinkMatch.All" IconClass="oi oi-home">
+        <NavMenu Title="NorthWind" Subtitle="Ventas & POS">
+            <NavMenuItem Href="" Match="NavLinkMatch.All" IconClass="bi bi-house-door-fill">
                 Inicio
             </NavMenuItem>
             <AuthorizeView>
                 <Authorized>
-                    <NavMenuItem Href="createorder" Match="NavLinkMatch.Prefix" IconClass="oi oi-plus">
+                    <NavMenuItem Href="createorder" Match="NavLinkMatch.Prefix" IconClass="bi bi-cart-plus-fill">
                         Nueva Orden
                     </NavMenuItem>
-                    <NavMenuItem Href="invoices" Match="NavLinkMatch.Prefix" IconClass="oi oi-document">
+                    <NavMenuItem Href="invoices" Match="NavLinkMatch.Prefix" IconClass="bi bi-receipt-cutoff">
                         Facturas
                     </NavMenuItem>
                 </Authorized>
@@ -21,13 +21,20 @@
 
     <main>
         <div class="top-row px-4 d-flex justify-content-between align-items-center">
-            <span class="text-secondary small">NorthWind Clean Architecture .NET 10</span>
+            <div class="d-flex align-items-center gap-2">
+                <span class="fw-semibold text-dark d-none d-sm-inline">NorthWind Sales</span>
+                <span class="badge system-status-badge d-inline-flex align-items-center gap-1">
+                    <span class="status-dot"></span>
+                    <span>.NET 10 Clean Architecture</span>
+                </span>
+                <span class="badge version-badge d-none d-md-inline-block">v1.0 Enterprise</span>
+            </div>
             <div>
                 <NorthWind.Membership.Frontend.RazorViews.Components.LoginDisplayComponent />
             </div>
         </div>
 
-        <article class="content px-4">
+        <article class="content px-4 py-3">
             @Body
         </article>
     </main>

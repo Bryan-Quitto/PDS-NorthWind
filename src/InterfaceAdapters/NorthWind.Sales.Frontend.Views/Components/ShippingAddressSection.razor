@@ -1,0 +1,50 @@
+@namespace NorthWind.Sales.Frontend.Views.Components
+
+<div class="card mb-4 border-info">
+    <div class="card-header bg-light py-2">
+        <span class="fw-bold text-info-emphasis">
+            <i class="bi bi-truck me-1"></i> @ViewMessages.ShipAddressLabel
+        </span>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label for="shipAddress" class="form-label fw-bold">@ViewMessages.ShipAddressLabel</label>
+                <InputText id="shipAddress" class="form-control" maxlength="60" @bind-Value="Model.ShipAddress" />
+                <ValidationMessage For="@(() => Model.ShipAddress)" class="text-danger small mt-1" />
+            </div>
+
+            <div class="col-md-2">
+                <label for="shipCity" class="form-label fw-bold">@ViewMessages.ShipCityLabel</label>
+                <RestrictedInputText id="shipCity"
+                                     class="form-control"
+                                     maxlength="15"
+                                     Mode="RestrictionMode.CustomRegex"
+                                     CustomPattern="^[\p{L}\s\.\'\-]$"
+                                     @bind-Value="Model.ShipCity" />
+                <ValidationMessage For="@(() => Model.ShipCity)" class="text-danger small mt-1" />
+            </div>
+
+            <div class="col-md-2">
+                <label for="shipCountry" class="form-label fw-bold">@ViewMessages.ShipCountryLabel</label>
+                <RestrictedInputText id="shipCountry"
+                                     class="form-control"
+                                     maxlength="15"
+                                     Mode="RestrictionMode.CustomRegex"
+                                     CustomPattern="^[\p{L}\s\.\'\-]$"
+                                     @bind-Value="Model.ShipCountry" />
+                <ValidationMessage For="@(() => Model.ShipCountry)" class="text-danger small mt-1" />
+            </div>
+
+            <div class="col-md-2">
+                <label for="shipPostalCode" class="form-label fw-bold">@ViewMessages.ShipPostalCodeLabel</label>
+                <RestrictedInputText id="shipPostalCode"
+                                     class="form-control"
+                                     maxlength="10"
+                                     Mode="RestrictionMode.PostalCode"
+                                     @bind-Value="Model.ShipPostalCode" />
+                <ValidationMessage For="@(() => Model.ShipPostalCode)" class="text-danger small mt-1" />
+            </div>
+        </div>
+    </div>
+</div>

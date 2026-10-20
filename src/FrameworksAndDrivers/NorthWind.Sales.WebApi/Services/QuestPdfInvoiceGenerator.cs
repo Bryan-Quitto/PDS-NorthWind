@@ -4,17 +4,26 @@ using QuestPDF.Infrastructure;
 using NorthWind.Sales.Backend.BusinessObjects.Interfaces.Services;
 using NorthWind.Sales.Entities.Dtos;
 using NorthWind.Sales.Entities;
+using Microsoft.Extensions.Options;
+using NorthWind.Sales.WebApi.Options;
 
 namespace NorthWind.Sales.WebApi.Services;
 
 public class QuestPdfInvoiceGenerator : IInvoicePdfGenerator
 {
+    private readonly CompanyBillingOptions _billingOptions;
+
     static QuestPdfInvoiceGenerator()
     {
         // QuestPDF Community License for open-source / education
         QuestPDF.Settings.License = LicenseType.Community;
         // QuestPDF 2025.1.0 aplicaba dos veces el offset de AlignRight/AlignCenter
         // sobre Text(), desplazando columnas fuera de la tabla. Corregido en 2026.9.x.
+    }
+
+    public QuestPdfInvoiceGenerator(IOptions<CompanyBillingOptions>? options = null)
+    {
+        _billingOptions = options?.Value ?? new CompanyBillingOptions();
     }
 
     public byte[] GenerateInvoicePdf(OrderInvoiceDto invoice)
@@ -37,17 +46,17 @@ public class QuestPdfInvoiceGenerator : IInvoicePdfGenerator
         return document.GeneratePdf();
     }
 
-    private static void ComposeHeader(IContainer container, OrderInvoiceDto invoice)
+    private void ComposeHeader(IContainer container, OrderInvoiceDto invoice)
     {
         container.Row(row =>
         {
             row.RelativeItem().Column(column =>
             {
-                column.Item().Text("NORTHWIND TRADERS").Bold().FontSize(22).FontColor(Colors.Blue.Darken2);
-                column.Item().Text("Soluciones Comerciales & Distribución").FontSize(10).FontColor(Colors.Grey.Darken1);
-                column.Item().Text("Av. Los Shyris N34-123 y Portugal").FontSize(9).FontColor(Colors.Grey.Darken2);
-                column.Item().Text("Quito - Ecuador | Tel: (02) 299-9000").FontSize(9).FontColor(Colors.Grey.Darken2);
-                column.Item().Text("RUC: 1790012345001").FontSize(9).FontColor(Colors.Grey.Darken2);
+                column.Item().Text(_billingOptions.CompanyName).Bold().FontSize(22).FontColor(Colors.Blue.Darken2);
+                column.Item().Text(_billingOptions.Subtitle).FontSize(10).FontColor(Colors.Grey.Darken1);
+                column.Item().Text(_billingOptions.Address).FontSize(9).FontColor(Colors.Grey.Darken2);
+                column.Item().Text(_billingOptions.Phone).FontSize(9).FontColor(Colors.Grey.Darken2);
+                column.Item().Text($"RUC: {_billingOptions.TaxId}").FontSize(9).FontColor(Colors.Grey.Darken2);
             });
 
             row.ConstantItem(200).Column(column =>
@@ -58,13 +67,13 @@ public class QuestPdfInvoiceGenerator : IInvoicePdfGenerator
                     box.Item().AlignCenter().Text($"No. {invoice.OrderId:D8}").Bold().FontSize(12);
                     var localOrderDate = invoice.OrderDate.ToEcuadorTime();
                     box.Item().PaddingTop(4).Text($"Fecha: {localOrderDate:dd/MM/yyyy HH:mm}").FontSize(9);
-                    box.Item().Text("Estado: EN PRUEBAS").FontSize(9).FontColor(Colors.Orange.Darken2).Bold();
+                    box.Item().Text($"Estado: {_billingOptions.EnvironmentType}").FontSize(9).FontColor(Colors.Orange.Darken2).Bold();
                 });
             });
         });
     }
 
-    private static void ComposeContent(IContainer container, OrderInvoiceDto invoice)
+    private void ComposeContent(IContainer container, OrderInvoiceDto invoice)
     {
         container.PaddingVertical(15).Column(column =>
         {
@@ -134,7 +143,7 @@ public class QuestPdfInvoiceGenerator : IInvoicePdfGenerator
 
                 totalsCol.Item().Row(r =>
                 {
-                    r.RelativeItem().Text("IVA (15%):");
+                    r.RelativeItem().Text($"IVA ({_billingOptions.VatRate * 100:0.#}%):");
                     r.RelativeItem().AlignRight().Text(invoice.Tax.ToString("C2"));
                 });
 

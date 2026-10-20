@@ -1,0 +1,20 @@
+@namespace NorthWind.RazorComponents
+
+<div class="@ContainerClass" role="status">
+    <div class="@SpinnerClass @ColorClass" aria-hidden="true"></div>
+    @if (!string.IsNullOrWhiteSpace(Text))
+    {
+        @if (Inline)
+        {
+            <span>@Text</span>
+        }
+        else
+        {
+            <p class="mt-2 text-muted small mb-0">@Text</p>
+        }
+    }
+    else
+    {
+        <span class="visually-hidden">Cargando...</span>
+    }
+</div>

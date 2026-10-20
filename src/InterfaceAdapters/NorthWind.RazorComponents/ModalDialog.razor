@@ -1,0 +1,61 @@
+@namespace NorthWind.RazorComponents
+
+@if (IsOpen)
+{
+    <div class="modal-backdrop fade show" @onclick="HandleBackdropClickAsync"></div>
+    <div class="modal fade show d-block"
+         tabindex="-1"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="@(!string.IsNullOrWhiteSpace(Title) ? TitleId : null)"
+         @onclick="HandleBackdropClickAsync">
+        <div class="@GetDialogClasses()" @onclick:stopPropagation="true">
+            <div class="modal-content shadow-lg">
+                @if (HeaderTemplate != null)
+                {
+                    <div class="modal-header @HeaderCssClass">
+                        @HeaderTemplate
+                        @if (ShowCloseButton)
+                        {
+                            <button type="button"
+                                    class="btn-close @(HeaderCssClass.Contains("text-white") ? "btn-close-white" : "")"
+                                    aria-label="Cerrar"
+                                    @onclick="CloseAsync"></button>
+                        }
+                    </div>
+                }
+                else if (!string.IsNullOrWhiteSpace(Title) || ShowCloseButton)
+                {
+                    <div class="modal-header @HeaderCssClass">
+                        <h5 class="modal-title" id="@TitleId">@Title</h5>
+                        @if (ShowCloseButton)
+                        {
+                            <button type="button"
+                                    class="btn-close @(HeaderCssClass.Contains("text-white") ? "btn-close-white" : "")"
+                                    aria-label="Cerrar"
+                                    @onclick="CloseAsync"></button>
+                        }
+                    </div>
+                }
+
+                <div class="modal-body">
+                    @if (BodyTemplate != null)
+                    {
+                        @BodyTemplate
+                    }
+                    else if (ChildContent != null)
+                    {
+                        @ChildContent
+                    }
+                </div>
+
+                @if (FooterTemplate != null)
+                {
+                    <div class="modal-footer">
+                        @FooterTemplate
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}

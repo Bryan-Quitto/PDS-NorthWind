@@ -1,0 +1,64 @@
+@namespace NorthWind.Sales.Frontend.Views.Components
+
+<div class="card mb-4 border-primary">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
+        <span class="fw-bold text-primary">
+            <i class="bi bi-person-badge me-1"></i> @ViewMessages.CustomerSectionTitle
+        </span>
+        <div class="d-flex align-items-center gap-2">
+            @if (!string.IsNullOrWhiteSpace(Model.CustomerId))
+            {
+                <button type="button" class="btn btn-sm btn-outline-danger" title="Limpiar Cliente" @onclick="AskClearCustomer">
+                    <i class="bi bi-person-x me-1"></i> Limpiar cliente
+                </button>
+            }
+            <button type="button" class="btn btn-sm btn-outline-primary" @onclick="HandleOpenCustomerModalAsync">
+                <i class="bi bi-search me-1"></i> @ViewMessages.SearchCustomerButton
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label for="customerId" class="form-label fw-bold">@ViewMessages.CustomerIdLabel</label>
+                <InputText id="customerId"
+                           class="form-control bg-light"
+                           @bind-Value="Model.CustomerId"
+                           placeholder="@ViewMessages.CustomerIdPlaceholder"
+                           readonly="true" />
+                <ValidationMessage For="@(() => Model.CustomerId)" class="text-danger small mt-1" />
+            </div>
+
+            <div class="col-md-5">
+                <label for="customerName" class="form-label fw-bold">@ViewMessages.CustomerNameLabel</label>
+                <input id="customerName"
+                       type="text"
+                       class="form-control bg-light"
+                       value="@Model.CustomerName"
+                       readonly />
+            </div>
+
+            <div class="col-md-4">
+                <label for="customerIdentification" class="form-label fw-bold">@ViewMessages.CustomerIdentificationLabel</label>
+                <input id="customerIdentification"
+                       type="text"
+                       class="form-control bg-light"
+                       value="@Model.CustomerIdentification"
+                       readonly />
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmación para Limpiar Cliente -->
+<ConfirmActionDialog @bind-IsOpen="_isClearModalOpen"
+                     Title="Confirmar Limpieza de Cliente"
+                     Message="¿Está seguro de que desea remover el cliente seleccionado de la orden?"
+                     HeaderCssClass="bg-warning text-dark"
+                     TitleTextCssClass="text-dark"
+                     Icon="bi bi-person-x-fill"
+                     ConfirmButtonText="Sí, Limpiar Cliente"
+                     ConfirmButtonIcon="bi bi-person-x"
+                     ConfirmButtonCssClass="btn-warning"
+                     OnConfirm="ConfirmClearCustomerAsync"
+                     OnCancel="CancelClearCustomer" />

@@ -1,3 +1,5 @@
+using NorthWind.RazorComponents.Services;
+
 namespace NorthWind.Sales.Frontend.IoC;
 
 public static class DependencyContainer
@@ -28,6 +30,8 @@ public static class DependencyContainer
         services.AddScoped(typeof(IModelValidatorHub<>), typeof(ModelValidatorHub<>));
 
         services.AddTransient<CreateOrderViewModel>();
+
+        services.AddScoped<IFileSaverService, FileSaverService>();
 
         return services;
     }

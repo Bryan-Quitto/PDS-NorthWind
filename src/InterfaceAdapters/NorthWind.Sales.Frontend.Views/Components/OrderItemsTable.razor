@@ -1,0 +1,113 @@
+@namespace NorthWind.Sales.Frontend.Views.Components
+
+<div class="card mb-4 border-secondary">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
+        <span class="fw-bold text-dark">
+            <i class="bi bi-cart3 me-1"></i> @ViewMessages.OrderDetailsTitle
+        </span>
+        <div class="d-flex align-items-center gap-2">
+            @if (Items.Count > 0)
+            {
+                <button type="button" class="btn btn-sm btn-outline-danger" @onclick="HandleOpenClearProductsModalAsync">
+                    <i class="bi bi-trash3 me-1"></i> Limpiar productos
+                </button>
+            }
+            <button type="button" class="btn btn-sm btn-success" @onclick="HandleOpenAddProductModalAsync">
+                <i class="bi bi-plus-circle me-1"></i> @ViewMessages.AddProductButton
+            </button>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        @if (Items.Count == 0)
+        {
+            <div class="p-4 text-muted text-center">
+                <i class="bi bi-bag-x fs-1 text-secondary d-block mb-2"></i>
+                @ViewMessages.EmptyOrderDetailsWarning
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 8%;">@ViewMessages.ProductIdLabel</th>
+                            <th style="width: 37%;">@ViewMessages.ProductNameLabel</th>
+                            <th style="width: 15%;" class="text-center">@ViewMessages.QuantityLabel</th>
+                            <th style="width: 15%;" class="text-end">@ViewMessages.UnitPriceLabel</th>
+                            <th style="width: 15%;" class="text-end">@ViewMessages.SubtotalLineLabel</th>
+                            <th style="width: 10%;" class="text-center">@ViewMessages.ActionsLabel</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var detail in Items)
+                        {
+                            <tr>
+                                <td class="text-muted fw-bold">
+                                    #@detail.ProductId
+                                </td>
+                                <td>
+                                    <input type="text"
+                                           class="form-control form-control-sm bg-light"
+                                           value="@detail.ProductName"
+                                           readonly />
+                                </td>
+                                <td class="text-center">
+                                    <input type="number"
+                                           step="1"
+                                           min="1"
+                                           max="32767"
+                                           class="form-control form-control-sm text-center mx-auto"
+                                           style="max-width: 90px;"
+                                           value="@detail.RawQuantity"
+                                           @onchange="(e) => HandleQuantityChangedAsync(detail, e)" />
+                                    <ValidationMessage For="@(() => detail.RawQuantity)" class="text-danger small" />
+                                    <ValidationMessage For="@(() => detail.Quantity)" class="text-danger small" />
+                                </td>
+                                <td>
+                                    <input type="text"
+                                           class="form-control form-control-sm bg-light text-end font-monospace"
+                                           value="@detail.UnitPrice.ToString("N2")"
+                                           readonly />
+                                    <ValidationMessage For="@(() => detail.UnitPrice)" class="text-danger small" />
+                                </td>
+                                <td class="text-end font-monospace fw-bold">
+                                    @detail.LineTotal.ToString("N2")
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-inline-flex align-items-center gap-1">
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-primary"
+                                                title="Reemplazar por otro producto"
+                                                @onclick="() => HandleReplaceProductAsync(detail.ProductId)">
+                                            <i class="bi bi-arrow-left-right"></i> Reemplazar
+                                        </button>
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-danger"
+                                                title="@ViewMessages.RemoveProductButton"
+                                                @onclick="() => AskRemoveDetail(detail)">
+                                            <i class="bi bi-trash"></i> @ViewMessages.RemoveProductButton
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Modal de Confirmación para Eliminar un Producto de la Orden -->
+<ConfirmActionDialog @bind-IsOpen="_isDeleteProductModalOpen"
+                     Title="Confirmar Eliminación de Producto"
+                     Message="@($"¿Está seguro de que desea eliminar '{_detailToDelete?.ProductName}' (Código #{_detailToDelete?.ProductId}) de la orden?")"
+                     HeaderCssClass="bg-danger text-white"
+                     TitleTextCssClass="text-white"
+                     Icon="bi bi-trash3-fill"
+                     ConfirmButtonText="Sí, Eliminar Producto"
+                     ConfirmButtonIcon="bi bi-trash"
+                     ConfirmButtonCssClass="btn-danger"
+                     OnConfirm="ConfirmRemoveDetailAsync"
+                     OnCancel="CancelRemoveDetail" />

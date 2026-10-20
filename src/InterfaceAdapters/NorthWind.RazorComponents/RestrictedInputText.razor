@@ -1,0 +1,10 @@
+@namespace NorthWind.RazorComponents
+@inherits InputBase<string>
+
+<input @attributes="FilteredAttributes"
+       class="@FormInputClass"
+       placeholder="@Placeholder"
+       maxlength="@MaxLength"
+       inputmode="@ResolvedInputMode"
+       value="@CurrentValueAsString"
+       @oninput="HandleInputAsync" />

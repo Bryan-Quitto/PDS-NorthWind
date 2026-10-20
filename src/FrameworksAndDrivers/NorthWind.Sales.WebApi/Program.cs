@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using NorthWind.Membership.Backend.Core.Options;
+using NorthWind.Sales.WebApi.Options;
 using System.Text;
 
 // Cargar variables de entorno desde archivo .env (buscando en directorio actual y superiores)
@@ -85,6 +86,7 @@ builder.Services.AddCors(options =>
 });
 
 // 5. Servicios de Clean Architecture de NorthWind Sales
+builder.Services.Configure<CompanyBillingOptions>(builder.Configuration.GetSection("CompanyBilling"));
 builder.Services.AddNorthWindSalesServices(builder.Configuration);
 builder.Services.AddSingleton<NorthWind.Sales.Backend.BusinessObjects.Interfaces.Services.IInvoicePdfGenerator, NorthWind.Sales.WebApi.Services.QuestPdfInvoiceGenerator>();
 

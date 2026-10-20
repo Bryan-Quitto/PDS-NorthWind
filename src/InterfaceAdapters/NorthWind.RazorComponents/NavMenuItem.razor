@@ -1,23 +1,17 @@
-<div class="nav-item px-3">
-    <NavLink class="nav-link" href="@Href" Match="@Match">
-        @if (!string.IsNullOrEmpty(IconClass))
+<div class="nav-item px-2 my-1">
+    <NavLink class="nav-link custom-nav-link d-flex align-items-center justify-content-between px-3 py-2 rounded-3" href="@Href" Match="@Match">
+        <div class="d-flex align-items-center gap-2">
+            @if (!string.IsNullOrEmpty(IconClass))
+            {
+                <span class="nav-icon-container d-inline-flex align-items-center justify-content-center">
+                    <i class="@IconClass" aria-hidden="true"></i>
+                </span>
+            }
+            <span class="nav-label">@ChildContent</span>
+        </div>
+        @if (!string.IsNullOrEmpty(BadgeText))
         {
-            <span class="@IconClass me-2" aria-hidden="true"></span>
+            <span class="badge @BadgeClass">@BadgeText</span>
         }
-        @ChildContent
     </NavLink>
 </div>
-
-@code {
-    [Parameter]
-    public string Href { get; set; } = string.Empty;
-
-    [Parameter]
-    public NavLinkMatch Match { get; set; } = NavLinkMatch.Prefix;
-
-    [Parameter]
-    public string? IconClass { get; set; }
-
-    [Parameter]
-    public RenderFragment? ChildContent { get; set; }
-}

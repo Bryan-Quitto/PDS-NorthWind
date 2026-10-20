@@ -1,3 +1,5 @@
+@namespace NorthWind.Sales.Frontend.Views
+
 <div class="card shadow-sm mb-4">
     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
         <h5 class="mb-0">
@@ -26,279 +28,29 @@
             <EditForm EditContext="@_editContext" OnValidSubmit="HandleValidSubmit">
                 <ModelValidator T="CreateOrderViewModel" />
 
-                <!-- SECCIÓN MAESTRO: DATOS DEL CLIENTE Y ENVÍO -->
-                <div class="card mb-4 border-primary">
-                    <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
-                        <span class="fw-bold text-primary">
-                            <i class="bi bi-person-badge me-1"></i> @ViewMessages.CustomerSectionTitle
-                        </span>
-                        <div class="d-flex align-items-center gap-2">
-                            @if (!string.IsNullOrWhiteSpace(Model.CustomerId))
-                            {
-                                @if (_isConfirmingClearCustomer)
-                                {
-                                    <div class="d-inline-flex align-items-center gap-1 bg-white px-2 py-1 border rounded shadow-sm">
-                                        <span class="small fw-bold text-danger me-1">¿Limpiar cliente?</span>
-                                        <button type="button" class="btn btn-sm btn-success py-0 px-2" title="Confirmar" @onclick="ConfirmClearCustomer">
-                                            <i class="bi bi-check-lg"></i> Sí
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-secondary py-0 px-2" title="Cancelar" @onclick="CancelClearCustomer">
-                                            <i class="bi bi-x-lg"></i> No
-                                        </button>
-                                    </div>
-                                }
-                                else
-                                {
-                                    <button type="button" class="btn btn-sm btn-outline-danger" title="Limpiar Cliente" @onclick="AskClearCustomer">
-                                        <i class="bi bi-person-x me-1"></i> Limpiar cliente
-                                    </button>
-                                }
-                            }
-                            <button type="button" class="btn btn-sm btn-outline-primary" @onclick="OpenCustomerModal">
-                                <i class="bi bi-search me-1"></i> @ViewMessages.SearchCustomerButton
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-md-3">
-                                <label for="customerId" class="form-label fw-bold">@ViewMessages.CustomerIdLabel</label>
-                                <InputText id="customerId"
-                                           class="form-control bg-light"
-                                           @bind-Value="Model.CustomerId"
-                                           placeholder="@ViewMessages.CustomerIdPlaceholder"
-                                           readonly="true" />
-                                <ValidationMessage For="@(() => Model.CustomerId)" class="text-danger small mt-1" />
-                            </div>
+                <!-- SECCIÓN MAESTRO: DATOS DEL CLIENTE -->
+                <CustomerSectionCard Model="@Model"
+                                     OnOpenCustomerModal="OpenCustomerModal"
+                                     OnClearCustomer="HandleClearCustomer" />
 
-                            <div class="col-md-5">
-                                <label for="customerName" class="form-label fw-bold">@ViewMessages.CustomerNameLabel</label>
-                                <input id="customerName"
-                                       type="text"
-                                       class="form-control bg-light"
-                                       value="@Model.CustomerName"
-                                       readonly />
-                            </div>
-
-                            <div class="col-md-4">
-                                <label for="customerIdentification" class="form-label fw-bold">@ViewMessages.CustomerIdentificationLabel</label>
-                                <input id="customerIdentification"
-                                       type="text"
-                                       class="form-control bg-light"
-                                       value="@Model.CustomerIdentification"
-                                       readonly />
-                            </div>
-
-                            <div class="col-md-6">
-                                <label for="shipAddress" class="form-label fw-bold">@ViewMessages.ShipAddressLabel</label>
-                                <InputText id="shipAddress" class="form-control" maxlength="60" @bind-Value="Model.ShipAddress" />
-                                <ValidationMessage For="@(() => Model.ShipAddress)" class="text-danger small mt-1" />
-                            </div>
-
-                            <div class="col-md-2">
-                                <label for="shipCity" class="form-label fw-bold">@ViewMessages.ShipCityLabel</label>
-                                <InputText id="shipCity"
-                                           class="form-control"
-                                           maxlength="15"
-                                           onkeypress="return event.key.length > 1 || /^[\p{L}\s\-']$/u.test(event.key)"
-                                           onpaste="const text = (event.clipboardData || window.clipboardData).getData('text'); if (!/^[\p{L}\s\-']*$/u.test(text)) { event.preventDefault(); }"
-                                           @bind-Value="Model.ShipCity" />
-                                <ValidationMessage For="@(() => Model.ShipCity)" class="text-danger small mt-1" />
-                            </div>
-
-                            <div class="col-md-2">
-                                <label for="shipCountry" class="form-label fw-bold">@ViewMessages.ShipCountryLabel</label>
-                                <InputText id="shipCountry"
-                                           class="form-control"
-                                           maxlength="15"
-                                           onkeypress="return event.key.length > 1 || /^[\p{L}\s\-']$/u.test(event.key)"
-                                           onpaste="const text = (event.clipboardData || window.clipboardData).getData('text'); if (!/^[\p{L}\s\-']*$/u.test(text)) { event.preventDefault(); }"
-                                           @bind-Value="Model.ShipCountry" />
-                                <ValidationMessage For="@(() => Model.ShipCountry)" class="text-danger small mt-1" />
-                            </div>
-
-                            <div class="col-md-2">
-                                <label for="shipPostalCode" class="form-label fw-bold">@ViewMessages.ShipPostalCodeLabel</label>
-                                <InputText id="shipPostalCode"
-                                           class="form-control"
-                                           maxlength="10"
-                                           onkeypress="return event.key.length > 1 || /^[a-zA-Z0-9\s\-]$/.test(event.key)"
-                                           onpaste="const text = (event.clipboardData || window.clipboardData).getData('text'); if (!/^[a-zA-Z0-9\s\-]*$/.test(text)) { event.preventDefault(); }"
-                                           @bind-Value="Model.ShipPostalCode" />
-                                <ValidationMessage For="@(() => Model.ShipPostalCode)" class="text-danger small mt-1" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <!-- SECCIÓN MAESTRO: DATOS DE ENVÍO -->
+                <ShippingAddressSection Model="@Model" />
 
                 <!-- SECCIÓN DETALLE: PRODUCTOS DE LA ORDEN -->
-                <div class="card mb-4 border-secondary">
-                    <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
-                        <span class="fw-bold text-dark">
-                            <i class="bi bi-cart3 me-1"></i> @ViewMessages.OrderDetailsTitle
-                        </span>
-                        <div class="d-flex align-items-center gap-2">
-                            @if (Model.OrderDetails.Count > 0)
-                            {
-                                <button type="button" class="btn btn-sm btn-outline-danger" @onclick="OpenClearProductsModal">
-                                    <i class="bi bi-trash3 me-1"></i> Limpiar productos
-                                </button>
-                            }
-                            <button type="button" class="btn btn-sm btn-success" @onclick="OpenProductModal">
-                                <i class="bi bi-plus-circle me-1"></i> @ViewMessages.AddProductButton
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card-body p-0">
-                        @if (Model.OrderDetails.Count == 0)
-                        {
-                            <div class="p-4 text-muted text-center">
-                                <i class="bi bi-bag-x fs-1 text-secondary d-block mb-2"></i>
-                                @ViewMessages.EmptyOrderDetailsWarning
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="table-responsive">
-                                <table class="table table-hover align-middle mb-0">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th style="width: 8%;">@ViewMessages.ProductIdLabel</th>
-                                            <th style="width: 37%;">@ViewMessages.ProductNameLabel</th>
-                                            <th style="width: 15%;" class="text-center">@ViewMessages.QuantityLabel</th>
-                                            <th style="width: 15%;" class="text-end">@ViewMessages.UnitPriceLabel</th>
-                                            <th style="width: 15%;" class="text-end">@ViewMessages.SubtotalLineLabel</th>
-                                            <th style="width: 10%;" class="text-center">@ViewMessages.ActionsLabel</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var detail in Model.OrderDetails)
-                                        {
-                                            <tr>
-                                                <td class="text-muted fw-bold">
-                                                    #@detail.ProductId
-                                                </td>
-                                                <td>
-                                                    <input type="text"
-                                                           class="form-control form-control-sm bg-light"
-                                                           value="@detail.ProductName"
-                                                           readonly />
-                                                </td>
-                                                <td class="text-center">
-                                                    <input type="number"
-                                                           step="1"
-                                                           min="1"
-                                                           max="32767"
-                                                           class="form-control form-control-sm text-center mx-auto"
-                                                           style="max-width: 90px;"
-                                                           value="@detail.RawQuantity"
-                                                           onkeypress="return event.key.length > 1 || /^\d$/.test(event.key)"
-                                                           @onchange="(e) => OnQuantityChanged(detail, e)" />
-                                                    <ValidationMessage For="@(() => detail.RawQuantity)" class="text-danger small" />
-                                                    <ValidationMessage For="@(() => detail.Quantity)" class="text-danger small" />
-                                                </td>
-                                                <td>
-                                                    <input type="text"
-                                                           class="form-control form-control-sm bg-light text-end font-monospace"
-                                                           value="@detail.UnitPrice.ToString("N2")"
-                                                           readonly />
-                                                    <ValidationMessage For="@(() => detail.UnitPrice)" class="text-danger small" />
-                                                </td>
-                                                <td class="text-end font-monospace fw-bold">
-                                                    @detail.LineTotal.ToString("N2")
-                                                </td>
-                                                <td class="text-center">
-                                                    @if (_confirmingDeleteProductId == detail.ProductId)
-                                                    {
-                                                        <div class="d-inline-flex align-items-center gap-1 bg-white p-1 border rounded shadow-sm">
-                                                            <button type="button"
-                                                                    class="btn btn-sm btn-danger py-0 px-2"
-                                                                    title="Confirmar eliminación"
-                                                                    @onclick="() => ConfirmRemoveDetail(detail)">
-                                                                <i class="bi bi-check-lg"></i> Sí
-                                                            </button>
-                                                            <button type="button"
-                                                                    class="btn btn-sm btn-secondary py-0 px-2"
-                                                                    title="Cancelar"
-                                                                    @onclick="CancelRemoveDetail">
-                                                                <i class="bi bi-x-lg"></i> No
-                                                            </button>
-                                                        </div>
-                                                    }
-                                                    else
-                                                    {
-                                                        <div class="d-inline-flex align-items-center gap-1">
-                                                            <button type="button"
-                                                                    class="btn btn-sm btn-outline-primary"
-                                                                    title="Reemplazar por otro producto"
-                                                                    @onclick="() => OpenReplaceProductModal(detail.ProductId)">
-                                                                <i class="bi bi-arrow-left-right"></i> Reemplazar
-                                                            </button>
-                                                            <button type="button"
-                                                                    class="btn btn-sm btn-outline-danger"
-                                                                    title="@ViewMessages.RemoveProductButton"
-                                                                    @onclick="() => AskRemoveDetail(detail.ProductId)">
-                                                                <i class="bi bi-trash"></i> @ViewMessages.RemoveProductButton
-                                                            </button>
-                                                        </div>
-                                                    }
-                                                </td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
-                        }
-                    </div>
-                </div>
+                <OrderItemsTable Items="@Model.OrderDetails"
+                                 OnOpenAddProductModal="OpenProductModal"
+                                 OnOpenClearProductsModal="OpenClearProductsModal"
+                                 OnReplaceProduct="OpenReplaceProductModal"
+                                 OnRemoveProduct="HandleRemoveProduct"
+                                 OnQuantityChanged="HandleQuantityChanged" />
 
                 <!-- RESUMEN FINANCIERO Y TOTALES -->
-                <div class="row justify-content-end mb-4">
-                    <div class="col-md-5 col-lg-4">
-                        <div class="card bg-light border-0 shadow-sm">
-                            <div class="card-body p-3">
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span class="text-muted">@ViewMessages.SubtotalAmountLabel</span>
-                                    <span class="font-monospace fw-bold">@Model.Subtotal.ToString("C2")</span>
-                                </div>
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span class="text-muted">@ViewMessages.TaxAmountLabel</span>
-                                    <span class="font-monospace fw-bold">@Model.Tax.ToString("C2")</span>
-                                </div>
-                                <hr class="my-2" />
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h5 class="mb-0 fw-bold text-primary">@ViewMessages.TotalAmountLabel</h5>
-                                    <h4 class="mb-0 font-monospace fw-bold text-success">@Model.Total.ToString("C2")</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- BOTONES DE ACCIÓN FINAL -->
-                <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
-                    <div>
-                        <button type="button"
-                                class="btn btn-outline-danger btn-lg px-4"
-                                disabled="@_isSubmitting"
-                                @onclick="OpenClearOrderModal">
-                            <i class="bi bi-trash3 me-1"></i> Limpiar orden
-                        </button>
-                    </div>
-                    <div>
-                        <button type="submit" class="btn btn-primary btn-lg px-4" disabled="@(_isSubmitting || Model.OrderDetails.Count == 0)">
-                            @if (_isSubmitting)
-                            {
-                                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                                @ViewMessages.SubmittingOrderButton
-                            }
-                            else
-                            {
-                                <i class="bi bi-check2-circle me-1"></i> @ViewMessages.SubmitOrderButton
-                            }
-                        </button>
-                    </div>
-                </div>
+                <OrderTotalsSummary Subtotal="@Model.Subtotal"
+                                    Tax="@Model.Tax"
+                                    Total="@Model.Total"
+                                    IsSubmitting="@_isSubmitting"
+                                    CanSubmit="@(Model.OrderDetails.Count > 0)"
+                                    OnOpenClearOrderModal="OpenClearOrderModal" />
             </EditForm>
         }
     </div>
@@ -312,306 +64,29 @@
                     ExcludedProductId="_replacingProductId"
                     OnProductSelected="HandleProductSelected" />
 
-<!-- MODAL DE CONFIRMACIÓN: LIMPIAR PRODUCTOS -->
-@if (_isClearProductsModalOpen)
-{
-    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.5);">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content shadow">
-                <div class="modal-header bg-warning text-dark">
-                    <h5 class="modal-title">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i> Confirmar Limpieza de Productos
-                    </h5>
-                    <button type="button" class="btn-close" @onclick="CloseClearProductsModal"></button>
-                </div>
-                <div class="modal-body py-4">
-                    <p class="mb-0 fs-6">
-                        ¿Está seguro de que desea eliminar todos los productos del detalle? La información del cliente y envío se mantendrá.
-                    </p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="CloseClearProductsModal">
-                        Cancelar
-                    </button>
-                    <button type="button" class="btn btn-warning" @onclick="ConfirmClearProducts">
-                        <i class="bi bi-trash3 me-1"></i> Sí, Limpiar Productos
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-}
+<!-- MODALES DE CONFIRMACIÓN -->
+<ConfirmActionDialog IsOpen="@_isClearProductsModalOpen"
+                     IsOpenChanged="@((val) => _isClearProductsModalOpen = val)"
+                     Title="Confirmar Limpieza de Productos"
+                     Message="¿Está seguro de que desea eliminar todos los productos del detalle? La información del cliente y envío se mantendrá."
+                     HeaderCssClass="bg-warning text-dark"
+                     TitleTextCssClass="text-dark"
+                     Icon="bi bi-exclamation-triangle-fill"
+                     ConfirmButtonText="Sí, Limpiar Productos"
+                     ConfirmButtonIcon="bi bi-trash3"
+                     ConfirmButtonCssClass="btn-warning"
+                     OnConfirm="ConfirmClearProducts"
+                     OnCancel="CloseClearProductsModal" />
 
-<!-- MODAL DE CONFIRMACIÓN: LIMPIAR ORDEN COMPLETA -->
-@if (_isClearOrderModalOpen)
-{
-    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.5);">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content shadow">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i> Confirmar Limpieza de Toda la Orden
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" @onclick="CloseClearOrderModal"></button>
-                </div>
-                <div class="modal-body py-4">
-                    <p class="mb-0 fs-6">
-                        ¿Está seguro de que desea reiniciar toda la orden? Se borrarán los datos del cliente, envío y todos los productos agregados.
-                    </p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="CloseClearOrderModal">
-                        Cancelar
-                    </button>
-                    <button type="button" class="btn btn-danger" @onclick="ConfirmClearOrder">
-                        <i class="bi bi-trash3 me-1"></i> Sí, Limpiar Toda la Orden
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-}
-
-@code {
-    [Parameter]
-    public CreateOrderViewModel Model { get; set; } = new();
-
-    [Inject]
-    public ICreateOrderGateway OrderGateway { get; set; } = default!;
-
-    [Inject]
-    public NavigationManager NavigationManager { get; set; } = default!;
-
-    private EditContext _editContext = default!;
-    private ValidationMessageStore _serverMessageStore = default!;
-    private Exception? _currentException;
-    private int? _createdOrderId;
-    private bool _isSubmitting;
-
-    private bool _isCustomerModalOpen;
-    private bool _isProductModalOpen;
-    private bool _isClearProductsModalOpen;
-    private bool _isClearOrderModalOpen;
-    private bool _isConfirmingClearCustomer;
-    private int? _confirmingDeleteProductId;
-    private int? _replacingProductId;
-
-    protected override void OnInitialized()
-    {
-        InitializeEditContext();
-    }
-
-    private void InitializeEditContext()
-    {
-        _editContext = new EditContext(Model);
-        _serverMessageStore = new ValidationMessageStore(_editContext);
-        _editContext.OnFieldChanged += (s, e) =>
-        {
-            _serverMessageStore.Clear(e.FieldIdentifier);
-            _editContext.NotifyValidationStateChanged();
-        };
-    }
-
-    private void OpenCustomerModal()
-    {
-        _isCustomerModalOpen = true;
-    }
-
-    private void AskClearCustomer()
-    {
-        _isConfirmingClearCustomer = true;
-    }
-
-    private void ClearServerErrors()
-    {
-        _currentException = null;
-        _serverMessageStore.Clear();
-    }
-
-    private void ConfirmClearCustomer()
-    {
-        ClearServerErrors();
-        Model.ClearCustomer();
-        _isConfirmingClearCustomer = false;
-        _editContext.NotifyValidationStateChanged();
-        StateHasChanged();
-    }
-
-    private void CancelClearCustomer()
-    {
-        _isConfirmingClearCustomer = false;
-    }
-
-    private void OpenProductModal()
-    {
-        ClearServerErrors();
-        _replacingProductId = null;
-        _isProductModalOpen = true;
-    }
-
-    private void OpenReplaceProductModal(int productId)
-    {
-        ClearServerErrors();
-        _confirmingDeleteProductId = null;
-        _replacingProductId = productId;
-        _isProductModalOpen = true;
-    }
-
-    private void OpenClearProductsModal()
-    {
-        _isClearProductsModalOpen = true;
-    }
-
-    private void CloseClearProductsModal()
-    {
-        _isClearProductsModalOpen = false;
-    }
-
-    private void ConfirmClearProducts()
-    {
-        ClearServerErrors();
-        Model.OrderDetails.Clear();
-        _confirmingDeleteProductId = null;
-        _replacingProductId = null;
-        _isClearProductsModalOpen = false;
-        _editContext.NotifyValidationStateChanged();
-        StateHasChanged();
-    }
-
-    private void OpenClearOrderModal()
-    {
-        _isClearOrderModalOpen = true;
-    }
-
-    private void CloseClearOrderModal()
-    {
-        _isClearOrderModalOpen = false;
-    }
-
-    private void ConfirmClearOrder()
-    {
-        ClearServerErrors();
-        Model.Reset();
-        _confirmingDeleteProductId = null;
-        _replacingProductId = null;
-        _isConfirmingClearCustomer = false;
-        _isClearOrderModalOpen = false;
-        InitializeEditContext();
-        StateHasChanged();
-    }
-
-    private void HandleCustomerSelected(CustomerDto customer)
-    {
-        ClearServerErrors();
-        Model.SetCustomer(customer);
-        _isConfirmingClearCustomer = false;
-        _editContext.NotifyValidationStateChanged();
-        StateHasChanged();
-    }
-
-    private void HandleProductSelected(ProductDto product)
-    {
-        ClearServerErrors();
-        if (_replacingProductId.HasValue)
-        {
-            Model.ReplaceDetail(_replacingProductId.Value, product.Id, product.Name, product.UnitPrice);
-            _replacingProductId = null;
-        }
-        else
-        {
-            Model.AddOrUpdateDetail(product.Id, product.Name, product.UnitPrice, 1);
-        }
-
-        _editContext.NotifyValidationStateChanged();
-        StateHasChanged();
-    }
-
-    private void OnQuantityChanged(CreateOrderDetailViewModel detail, ChangeEventArgs e)
-    {
-        ClearServerErrors();
-        var rawVal = e.Value?.ToString() ?? string.Empty;
-
-        if (int.TryParse(rawVal, out var intQty) && intQty > 0 && intQty <= short.MaxValue)
-        {
-            Model.UpdateQuantity(detail, (short)intQty, rawVal);
-        }
-        else
-        {
-            Model.UpdateQuantity(detail, 0, rawVal);
-        }
-
-        // Notifica cambios tanto para RawQuantity como para Quantity para que se ejecuten las validaciones
-        _editContext.NotifyFieldChanged(new FieldIdentifier(detail, nameof(detail.RawQuantity)));
-        _editContext.NotifyFieldChanged(new FieldIdentifier(detail, nameof(detail.Quantity)));
-        StateHasChanged();
-    }
-
-    private void AskRemoveDetail(int productId)
-    {
-        _confirmingDeleteProductId = productId;
-    }
-
-    private void CancelRemoveDetail()
-    {
-        _confirmingDeleteProductId = null;
-    }
-
-    private void ConfirmRemoveDetail(CreateOrderDetailViewModel detail)
-    {
-        ClearServerErrors();
-        Model.RemoveDetail(detail);
-        _confirmingDeleteProductId = null;
-        _editContext.NotifyValidationStateChanged();
-        StateHasChanged();
-    }
-
-    private async Task HandleValidSubmit()
-    {
-        _currentException = null;
-        _serverMessageStore.Clear();
-        _editContext.NotifyValidationStateChanged();
-        _isSubmitting = true;
-
-        try
-        {
-            var dto = Model.ToDto();
-            var orderId = await OrderGateway.CreateOrderAsync(dto);
-            NavigationManager.NavigateTo($"invoices/{orderId}");
-        }
-        catch (Exception ex)
-        {
-            _currentException = ex;
-
-            // Inyectar errores devueltos por el backend al ValidationMessageStore del formulario
-            if (ex.Data.Contains("Errors") && ex.Data["Errors"] is IEnumerable<ValidationError> validationErrors)
-            {
-                var errorsList = validationErrors.ToList();
-                if (errorsList.Count > 0)
-                {
-                    foreach (var error in errorsList)
-                    {
-                        var fieldIdentifier = ModelValidator<CreateOrderViewModel>.ResolveFieldIdentifier(Model, error.PropertyName);
-                        var fieldMessage = error.ErrorMessage.Contains("superan las existencias", StringComparison.OrdinalIgnoreCase)
-                            ? "Stock insuficiente"
-                            : error.ErrorMessage;
-
-                        _serverMessageStore.Add(fieldIdentifier, fieldMessage);
-                    }
-                    _editContext.NotifyValidationStateChanged();
-                }
-            }
-        }
-        finally
-        {
-            _isSubmitting = false;
-        }
-    }
-
-    private void ResetForm()
-    {
-        _createdOrderId = null;
-        _currentException = null;
-        Model.Reset();
-        InitializeEditContext();
-    }
-}
+<ConfirmActionDialog IsOpen="@_isClearOrderModalOpen"
+                     IsOpenChanged="@((val) => _isClearOrderModalOpen = val)"
+                     Title="Confirmar Limpieza de Toda la Orden"
+                     Message="¿Está seguro de que desea reiniciar toda la orden? Se borrarán los datos del cliente, envío y todos los productos agregados."
+                     HeaderCssClass="bg-danger text-white"
+                     TitleTextCssClass="text-white"
+                     Icon="bi bi-exclamation-triangle-fill"
+                     ConfirmButtonText="Sí, Limpiar Toda la Orden"
+                     ConfirmButtonIcon="bi bi-trash3"
+                     ConfirmButtonCssClass="btn-danger"
+                     OnConfirm="ConfirmClearOrder"
+                     OnCancel="CloseClearOrderModal" />

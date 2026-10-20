@@ -1,0 +1,149 @@
+@namespace NorthWind.RazorComponents
+
+@if (ShowPageInfo)
+{
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 @Class">
+        <small class="text-muted">
+            @if (!string.IsNullOrWhiteSpace(CustomInfoText))
+            {
+                @CustomInfoText
+            }
+            else if (TotalCount > 0)
+            {
+                <span>Total registros: <strong>@TotalCount</strong> | Página <strong>@CurrentPage</strong> de <strong>@Math.Max(1, TotalPages)</strong></span>
+            }
+            else
+            {
+                <span>Página <strong>@CurrentPage</strong> de <strong>@Math.Max(1, TotalPages)</strong></span>
+            }
+        </small>
+
+        <nav aria-label="Navegación de páginas">
+            <ul class="pagination mb-0">
+                @if (ShowFirstLastButtons)
+                {
+                    <li class="page-item @(!HasPrevious ? "disabled" : "")">
+                        <button class="page-link"
+                                type="button"
+                                aria-label="Primera página"
+                                disabled="@(!HasPrevious)"
+                                @onclick="() => SelectPageAsync(1)">
+                            <i class="bi bi-chevron-double-left" aria-hidden="true"></i>
+                        </button>
+                    </li>
+                }
+
+                <li class="page-item @(!HasPrevious ? "disabled" : "")">
+                    <button class="page-link"
+                            type="button"
+                            aria-label="Página anterior"
+                            disabled="@(!HasPrevious)"
+                            @onclick="() => SelectPageAsync(CurrentPage - 1)">
+                        <i class="bi bi-chevron-left" aria-hidden="true"></i>
+                    </button>
+                </li>
+
+                @for (int p = CalculatedStartPage; p <= CalculatedEndPage; p++)
+                {
+                    var pageNumber = p;
+                    var isActive = pageNumber == CurrentPage;
+                    <li class="page-item @(isActive ? "active" : "")" aria-current="@(isActive ? "page" : null)">
+                        <button class="page-link"
+                                type="button"
+                                @onclick="() => SelectPageAsync(pageNumber)">
+                            @pageNumber
+                        </button>
+                    </li>
+                }
+
+                <li class="page-item @(!HasNext ? "disabled" : "")">
+                    <button class="page-link"
+                            type="button"
+                            aria-label="Página siguiente"
+                            disabled="@(!HasNext)"
+                            @onclick="() => SelectPageAsync(CurrentPage + 1)">
+                        <i class="bi bi-chevron-right" aria-hidden="true"></i>
+                    </button>
+                </li>
+
+                @if (ShowFirstLastButtons)
+                {
+                    <li class="page-item @(!HasNext ? "disabled" : "")">
+                        <button class="page-link"
+                                type="button"
+                                aria-label="Última página"
+                                disabled="@(!HasNext)"
+                                @onclick="() => SelectPageAsync(TotalPages)">
+                            <i class="bi bi-chevron-double-right" aria-hidden="true"></i>
+                        </button>
+                    </li>
+                }
+            </ul>
+        </nav>
+    </div>
+}
+else
+{
+    <nav class="@Class" aria-label="Navegación de páginas">
+        <ul class="pagination mb-0">
+            @if (ShowFirstLastButtons)
+            {
+                <li class="page-item @(!HasPrevious ? "disabled" : "")">
+                    <button class="page-link"
+                            type="button"
+                            aria-label="Primera página"
+                            disabled="@(!HasPrevious)"
+                            @onclick="() => SelectPageAsync(1)">
+                        <i class="bi bi-chevron-double-left" aria-hidden="true"></i>
+                    </button>
+                </li>
+            }
+
+            <li class="page-item @(!HasPrevious ? "disabled" : "")">
+                <button class="page-link"
+                        type="button"
+                        aria-label="Página anterior"
+                        disabled="@(!HasPrevious)"
+                        @onclick="() => SelectPageAsync(CurrentPage - 1)">
+                    <i class="bi bi-chevron-left" aria-hidden="true"></i>
+                </button>
+            </li>
+
+            @for (int p = CalculatedStartPage; p <= CalculatedEndPage; p++)
+            {
+                var pageNumber = p;
+                var isActive = pageNumber == CurrentPage;
+                <li class="page-item @(isActive ? "active" : "")" aria-current="@(isActive ? "page" : null)">
+                    <button class="page-link"
+                            type="button"
+                            @onclick="() => SelectPageAsync(pageNumber)">
+                        @pageNumber
+                    </button>
+                </li>
+            }
+
+            <li class="page-item @(!HasNext ? "disabled" : "")">
+                <button class="page-link"
+                        type="button"
+                        aria-label="Página siguiente"
+                        disabled="@(!HasNext)"
+                        @onclick="() => SelectPageAsync(CurrentPage + 1)">
+                    <i class="bi bi-chevron-right" aria-hidden="true"></i>
+                </button>
+            </li>
+
+            @if (ShowFirstLastButtons)
+            {
+                <li class="page-item @(!HasNext ? "disabled" : "")">
+                    <button class="page-link"
+                            type="button"
+                            aria-label="Última página"
+                            disabled="@(!HasNext)"
+                            @onclick="() => SelectPageAsync(TotalPages)">
+                        <i class="bi bi-chevron-double-right" aria-hidden="true"></i>
+                    </button>
+                </li>
+            }
+        </ul>
+    </nav>
+}

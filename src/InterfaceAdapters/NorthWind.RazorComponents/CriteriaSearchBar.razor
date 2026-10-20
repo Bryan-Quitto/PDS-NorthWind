@@ -1,0 +1,85 @@
+@namespace NorthWind.RazorComponents
+
+<div class="input-group @Class">
+    @if (Criteria.Count > 0)
+    {
+        <div class="btn-group position-relative">
+            <button class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center gap-1 shadow-none"
+                    type="button"
+                    @onclick="ToggleDropdown"
+                    aria-expanded="@_isDropdownOpen"
+                    aria-haspopup="true"
+                    disabled="@IsSearching">
+                @if (!string.IsNullOrEmpty(SelectedCriterion?.Icon))
+                {
+                    <i class="@SelectedCriterion.Icon text-primary me-1"></i>
+                }
+                <span class="fw-semibold">@(SelectedCriterion?.Label ?? "Criterio")</span>
+            </button>
+
+            @if (_isDropdownOpen)
+            {
+                <div class="position-fixed top-0 start-0 w-100 h-100"
+                     style="z-index: 1045; background: transparent;"
+                     @onclick="ToggleDropdown"></div>
+
+                <ul class="dropdown-menu shadow show"
+                    style="position: absolute; z-index: 1050; top: 100%; left: 0; min-width: 200px;">
+                    @foreach (var criterion in Criteria)
+                    {
+                        var isSelected = string.Equals(criterion.Key, SelectedCriterion?.Key, StringComparison.OrdinalIgnoreCase);
+                        <li>
+                            <button class="dropdown-item d-flex align-items-center gap-2 @(isSelected ? "active" : "")"
+                                    type="button"
+                                    @onclick="() => SelectCriterionAsync(criterion.Key)">
+                                @if (!string.IsNullOrEmpty(criterion.Icon))
+                                {
+                                    <i class="@criterion.Icon"></i>
+                                }
+                                <span>@criterion.Label</span>
+                            </button>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+    }
+
+    <input type="text"
+           class="form-control"
+           placeholder="@Placeholder"
+           value="@SearchText"
+           maxlength="@MaxLength"
+           @oninput="HandleSearchInputAsync"
+           @onkeydown="HandleKeyDownAsync"
+           disabled="@IsSearching"
+           aria-label="@Placeholder" />
+
+    @if (ShowClearButton && !string.IsNullOrEmpty(SearchText))
+    {
+        <button class="btn btn-outline-secondary"
+                type="button"
+                @onclick="HandleClearAsync"
+                disabled="@IsSearching"
+                title="@ClearButtonText"
+                aria-label="@ClearButtonText">
+            <i class="bi bi-x-lg"></i>
+        </button>
+    }
+
+    <button class="btn btn-primary d-flex align-items-center gap-1 px-3"
+            type="button"
+            @onclick="HandleSearchAsync"
+            disabled="@IsSearching">
+        @if (IsSearching)
+        {
+            <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+            <span>Buscando...</span>
+        }
+        else
+        {
+            <i class="bi bi-search me-1"></i>
+            <span>@SearchButtonText</span>
+        }
+    </button>
+</div>

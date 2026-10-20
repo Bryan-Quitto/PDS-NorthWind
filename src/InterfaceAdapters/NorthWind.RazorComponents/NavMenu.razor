@@ -1,31 +1,40 @@
-<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">@Title</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </div>
+<div class="sidebar-header d-flex align-items-center justify-content-between px-3 py-3">
+    <a class="sidebar-brand text-decoration-none d-flex align-items-center gap-2" href="">
+        <div class="sidebar-brand-icon-wrapper">
+            <i class="bi bi-box-seam-fill"></i>
+        </div>
+        <div class="sidebar-brand-info d-flex flex-column">
+            <span class="sidebar-brand-title">@Title</span>
+            <span class="sidebar-brand-subtitle">@Subtitle</span>
+        </div>
+    </a>
+    <button title="Alternar menú de navegación" class="sidebar-mobile-toggle d-md-none" @onclick="ToggleNavMenu">
+        <i class="bi @(_collapseNavMenu ? "bi-list" : "bi-x-lg")"></i>
+    </button>
 </div>
 
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
+<div class="@NavMenuCssClass nav-scrollable d-flex flex-column justify-content-between" @onclick="ToggleNavMenu">
+    <nav class="sidebar-nav flex-column py-2">
+        <div class="sidebar-section-header px-3 mb-2">
+            <span class="sidebar-section-title">MENÚ PRINCIPAL</span>
+        </div>
         @ChildContent
     </nav>
+
+    <div class="sidebar-footer px-3 py-3 mt-auto">
+        @if (FooterContent != null)
+        {
+            @FooterContent
+        }
+        else
+        {
+            <div class="sidebar-footer-card p-2 rounded-3">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="status-indicator-dot"></span>
+                    <span class="sidebar-footer-label">PDS · Quinto Semestre</span>
+                </div>
+                <div class="sidebar-footer-sub">Clean Architecture .NET 10</div>
+            </div>
+        }
+    </div>
 </div>
-
-@code {
-    [Parameter]
-    public string Title { get; set; } = "NorthWind";
-
-    [Parameter]
-    public RenderFragment? ChildContent { get; set; }
-
-    private bool collapseNavMenu = true;
-
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
-}

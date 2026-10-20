@@ -1,0 +1,32 @@
+@namespace NorthWind.Sales.Frontend.Views.Components
+
+<ModalDialog IsOpen="@IsOpen"
+             IsOpenChanged="@IsOpenChanged"
+             Title="@Title"
+             Size="ModalSize.Medium"
+             Centered="true"
+             HeaderCssClass="@HeaderCssClass"
+             OnClose="HandleCancelAsync">
+    <HeaderTemplate>
+        <h5 class="modal-title @TitleTextCssClass">
+            <i class="@Icon me-2"></i>@Title
+        </h5>
+    </HeaderTemplate>
+    <BodyTemplate>
+        <p class="mb-0 fs-6">
+            @Message
+        </p>
+    </BodyTemplate>
+    <FooterTemplate>
+        <button type="button" class="btn btn-secondary" @onclick="HandleCancelAsync">
+            @CancelButtonText
+        </button>
+        <button type="button" class="btn @ConfirmButtonCssClass" @onclick="HandleConfirmAsync">
+            @if (!string.IsNullOrWhiteSpace(ConfirmButtonIcon))
+            {
+                <i class="@ConfirmButtonIcon me-1"></i>
+            }
+            @ConfirmButtonText
+        </button>
+    </FooterTemplate>
+</ModalDialog>

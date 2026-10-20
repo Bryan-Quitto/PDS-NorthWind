@@ -1,366 +1,100 @@
-@if (IsOpen)
-{
-    <div class="modal fade show d-block" tabindex="-1" role="dialog" style="background-color: rgba(0, 0, 0, 0.5);">
-        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content shadow-lg">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title">
-                        <i class="bi bi-people-fill me-2"></i>@ViewMessages.CustomerSearchTitle
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" aria-label="Close" @onclick="CloseAsync"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="input-group mb-3">
-                        <button class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center gap-1 px-3 shadow-none"
-                                type="button"
-                                @onclick="ToggleCriteriaDropdown"
-                                aria-expanded="@_isDropdownOpen">
-                            <i class="@GetCriteriaIcon(_selectedCriteria) text-primary"></i>
-                            <span class="fw-semibold">@GetCriteriaLabel(_selectedCriteria)</span>
-                        </button>
+@namespace NorthWind.Sales.Frontend.Views
 
-                        <div class="dropdown-menu shadow @(_isDropdownOpen ? "show" : "")" style="position: absolute; z-index: 1050; top: 100%; left: 0; min-width: 240px;">
-                            <h6 class="dropdown-header text-uppercase fw-bold text-muted small pb-1">Búsqueda General</h6>
-                            <button class="dropdown-item d-flex align-items-center gap-2 @(_selectedCriteria == CustomerSearchCriteria.All ? "active" : "")"
-                                    type="button"
-                                    @onclick="() => SelectCriteriaAsync(CustomerSearchCriteria.All)">
-                                <i class="bi bi-grid-fill"></i>
-                                <span>@ViewMessages.CriteriaAll</span>
-                            </button>
-                            <button class="dropdown-item d-flex align-items-center gap-2 @(_selectedCriteria == CustomerSearchCriteria.Identification ? "active" : "")"
-                                    type="button"
-                                    @onclick="() => SelectCriteriaAsync(CustomerSearchCriteria.Identification)">
-                                <i class="bi bi-card-text"></i>
-                                <span>@ViewMessages.CriteriaIdentification</span>
-                            </button>
-                            <button class="dropdown-item d-flex align-items-center gap-2 @(_selectedCriteria == CustomerSearchCriteria.Id ? "active" : "")"
-                                    type="button"
-                                    @onclick="() => SelectCriteriaAsync(CustomerSearchCriteria.Id)">
-                                <i class="bi bi-key-fill"></i>
-                                <span>@ViewMessages.CriteriaCustomerId</span>
-                            </button>
+<ModalDialog IsOpen="@IsOpen"
+             IsOpenChanged="@IsOpenChanged"
+             Title="@ViewMessages.CustomerSearchTitle"
+             Size="ModalSize.Large"
+             Centered="true"
+             Scrollable="true"
+             HeaderCssClass="bg-primary text-white"
+             OnClose="CloseAsync">
+    <HeaderTemplate>
+        <h5 class="modal-title">
+            <i class="bi bi-people-fill me-2"></i>@ViewMessages.CustomerSearchTitle
+        </h5>
+    </HeaderTemplate>
+    <BodyTemplate>
+        <CriteriaSearchBar Criteria="@CustomerCriteria"
+                           SelectedCriterionKey="@_selectedCriteria.ToString()"
+                           SelectedCriterionKeyChanged="HandleCriterionChangedAsync"
+                           @bind-SearchText="_searchTerm"
+                           Placeholder="@GetSearchPlaceholder()"
+                           MaxLength="@GetSearchMaxLength()"
+                           OnSearch="() => SearchAsync(1)"
+                           OnClear="ClearSearchAsync"
+                           IsSearching="_isLoading"
+                           SearchButtonText="@ViewMessages.SearchButton"
+                           ClearButtonText="@ViewMessages.ClearButton"
+                           ShowClearButton="true"
+                           Class="mb-3" />
 
-                            <li><hr class="dropdown-divider my-1"></li>
-                            <h6 class="dropdown-header text-uppercase fw-bold text-muted small pb-1">Personas Naturales</h6>
-                            <button class="dropdown-item d-flex align-items-center gap-2 @(_selectedCriteria == CustomerSearchCriteria.Name ? "active" : "")"
-                                    type="button"
-                                    @onclick="() => SelectCriteriaAsync(CustomerSearchCriteria.Name)">
-                                <i class="bi bi-person-badge"></i>
-                                <span>@ViewMessages.CriteriaFullName</span>
-                            </button>
-                            <button class="dropdown-item d-flex align-items-center gap-2 @(_selectedCriteria == CustomerSearchCriteria.LastName ? "active" : "")"
-                                    type="button"
-                                    @onclick="() => SelectCriteriaAsync(CustomerSearchCriteria.LastName)">
-                                <i class="bi bi-person"></i>
-                                <span>@ViewMessages.CriteriaLastName</span>
-                            </button>
-
-                            <li><hr class="dropdown-divider my-1"></li>
-                            <h6 class="dropdown-header text-uppercase fw-bold text-muted small pb-1">Empresas / Jurídicas</h6>
-                            <button class="dropdown-item d-flex align-items-center gap-2 @(_selectedCriteria == CustomerSearchCriteria.BusinessName ? "active" : "")"
-                                    type="button"
-                                    @onclick="() => SelectCriteriaAsync(CustomerSearchCriteria.BusinessName)">
-                                <i class="bi bi-building"></i>
-                                <span>@ViewMessages.CriteriaBusinessName</span>
-                            </button>
-                            <button class="dropdown-item d-flex align-items-center gap-2 @(_selectedCriteria == CustomerSearchCriteria.TradeName ? "active" : "")"
-                                    type="button"
-                                    @onclick="() => SelectCriteriaAsync(CustomerSearchCriteria.TradeName)">
-                                <i class="bi bi-shop"></i>
-                                <span>@ViewMessages.CriteriaTradeName</span>
-                            </button>
-                        </div>
-
-                        <input type="text"
-                               class="form-control"
-                               placeholder="@GetSearchPlaceholder()"
-                               value="@_searchTerm"
-                               maxlength="@GetSearchMaxLength()"
-                               inputmode="@GetSearchInputMode()"
-                               onkeypress="@GetSearchKeyPress()"
-                               onpaste="@GetSearchPaste()"
-                               @oninput="HandleSearchInput"
-                               @onkeydown="HandleKeyDown" />
-                        <button class="btn btn-primary px-3" type="button" @onclick="() => SearchAsync(1)" disabled="@_isLoading">
-                            <i class="bi bi-search me-1"></i>@ViewMessages.SearchButton
-                        </button>
-                        <button class="btn btn-outline-secondary" type="button" @onclick="ClearSearchAsync" disabled="@_isLoading">
-                            @ViewMessages.ClearButton
-                        </button>
-                    </div>
-
-                    @if (_isLoading)
-                    {
-                        <div class="text-center py-4">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">@ViewMessages.LoadingData</span>
-                            </div>
-                            <p class="mt-2 text-muted small">@ViewMessages.LoadingData</p>
-                        </div>
-                    }
-                    else if (_customers.Count == 0)
-                    {
-                        <div class="alert alert-info text-center my-3">
-                            @ViewMessages.NoRecordsFound
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="table-responsive">
-                            <table class="table table-hover table-striped align-middle mb-0">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>@ViewMessages.CustomerNameLabel</th>
-                                        <th>@ViewMessages.CustomerIdentificationLabel</th>
-                                        <th class="text-center" style="width: 120px;">@ViewMessages.ActionsLabel</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var customer in _customers)
-                                    {
-                                        <tr>
-                                            <td class="fw-bold">@customer.Id</td>
-                                            <td>
-                                                <div>@customer.Name</div>
-                                                @if (!string.IsNullOrWhiteSpace(customer.TradeName))
-                                                {
-                                                    <div class="text-muted small"><i class="bi bi-shop me-1"></i>Comercial: @customer.TradeName</div>
-                                                }
-                                                @if (customer.CustomerType == CustomerType.Legal)
-                                                {
-                                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle small">Jurídica</span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle small">Natural</span>
-                                                }
-                                            </td>
-                                            <td>@customer.Identification</td>
-                                            <td class="text-center">
-                                                <button class="btn btn-sm btn-success px-3"
-                                                        type="button"
-                                                        @onclick="() => SelectCustomerAsync(customer)">
-                                                    @ViewMessages.SelectButton
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
-                            <small class="text-muted">
-                                @ViewMessages.TotalRecordsLabel <strong>@_totalCount</strong> | @ViewMessages.PageLabel @_currentPage @ViewMessages.OfLabel @_totalPages
-                            </small>
-                            <div class="btn-group btn-group-sm">
-                                <button class="btn btn-outline-secondary"
-                                        type="button"
-                                        disabled="@(!HasPreviousPage || _isLoading)"
-                                        @onclick="PreviousPageAsync">
-                                    &laquo; @ViewMessages.PreviousButton
-                                </button>
-                                <button class="btn btn-outline-secondary"
-                                        type="button"
-                                        disabled="@(!HasNextPage || _isLoading)"
-                                        @onclick="NextPageAsync">
-                                    @ViewMessages.NextButton &raquo;
-                                </button>
-                            </div>
-                        </div>
-                    }
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="CloseAsync">
-                        @ViewMessages.CloseButton
-                    </button>
-                </div>
+        @if (_isLoading)
+        {
+            <LoadingSpinner Text="@ViewMessages.LoadingData" Color="primary" />
+        }
+        else if (_customers.Count == 0)
+        {
+            <div class="alert alert-info text-center my-3">
+                @ViewMessages.NoRecordsFound
             </div>
-        </div>
-    </div>
-}
-
-@code {
-    [Parameter]
-    public bool IsOpen { get; set; }
-
-    [Parameter]
-    public EventCallback<bool> IsOpenChanged { get; set; }
-
-    [Parameter]
-    public EventCallback<CustomerDto> OnCustomerSelected { get; set; }
-
-    [Inject]
-    public ISearchGateway SearchGateway { get; set; } = default!;
-
-    private CustomerSearchCriteria _selectedCriteria = CustomerSearchCriteria.All;
-    private bool _isDropdownOpen = false;
-    private string _searchTerm = string.Empty;
-    private int _currentPage = 1;
-    private const int PageSize = 5;
-    private int _totalCount = 0;
-    private int _totalPages = 1;
-    private bool _isLoading = false;
-    private IReadOnlyList<CustomerDto> _customers = [];
-
-    private bool HasPreviousPage => _currentPage > 1;
-    private bool HasNextPage => _currentPage < _totalPages;
-
-    protected override async Task OnParametersSetAsync()
-    {
-        if (IsOpen && _customers.Count == 0 && !_isLoading)
-        {
-            await SearchAsync(1);
         }
-    }
-
-    private void ToggleCriteriaDropdown()
-    {
-        _isDropdownOpen = !_isDropdownOpen;
-    }
-
-    private async Task SelectCriteriaAsync(CustomerSearchCriteria criteria)
-    {
-        _selectedCriteria = criteria;
-        _isDropdownOpen = false;
-        _searchTerm = string.Empty;
-        await SearchAsync(1);
-    }
-
-    private string GetCriteriaLabel(CustomerSearchCriteria criteria) => criteria switch
-    {
-        CustomerSearchCriteria.Identification => ViewMessages.CriteriaIdentification,
-        CustomerSearchCriteria.Name => ViewMessages.CriteriaFullName,
-        CustomerSearchCriteria.LastName => ViewMessages.CriteriaLastName,
-        CustomerSearchCriteria.BusinessName => ViewMessages.CriteriaBusinessName,
-        CustomerSearchCriteria.TradeName => ViewMessages.CriteriaTradeName,
-        CustomerSearchCriteria.Id => ViewMessages.CriteriaCustomerId,
-        _ => ViewMessages.CriteriaAll
-    };
-
-    private string GetCriteriaIcon(CustomerSearchCriteria criteria) => criteria switch
-    {
-        CustomerSearchCriteria.Identification => "bi bi-card-text",
-        CustomerSearchCriteria.Name => "bi bi-person-badge",
-        CustomerSearchCriteria.LastName => "bi bi-person",
-        CustomerSearchCriteria.BusinessName => "bi bi-building",
-        CustomerSearchCriteria.TradeName => "bi bi-shop",
-        CustomerSearchCriteria.Id => "bi bi-key-fill",
-        _ => "bi bi-grid-fill"
-    };
-
-    private string GetSearchPlaceholder() => _selectedCriteria switch
-    {
-        CustomerSearchCriteria.Identification => "Buscar por cédula (10 dígitos) o RUC (13 dígitos)...",
-        CustomerSearchCriteria.Name => "Buscar por nombres y apellidos (ej. Ana Trujillo)...",
-        CustomerSearchCriteria.LastName => "Buscar por primer apellido...",
-        CustomerSearchCriteria.BusinessName => "Buscar por razón social de la empresa...",
-        CustomerSearchCriteria.TradeName => "Buscar por nombre comercial (ej. Taquería El Paso)...",
-        CustomerSearchCriteria.Id => "Buscar por código de cliente (ej. ALFKI)...",
-        _ => "Buscar cliente por ID, nombres, razón social o identificación..."
-    };
-
-    private int? GetSearchMaxLength() => _selectedCriteria switch
-    {
-        CustomerSearchCriteria.Identification => 13,
-        CustomerSearchCriteria.Id => 5,
-        CustomerSearchCriteria.LastName => 50,
-        CustomerSearchCriteria.BusinessName => 150,
-        CustomerSearchCriteria.TradeName => 150,
-        CustomerSearchCriteria.Name => 50,
-        _ => 50
-    };
-
-    private string GetSearchInputMode() => _selectedCriteria switch
-    {
-        CustomerSearchCriteria.Identification => "numeric",
-        _ => "text"
-    };
-
-    private string? GetSearchKeyPress() => _selectedCriteria switch
-    {
-        CustomerSearchCriteria.Identification => "return event.key.length > 1 || /^\\d$/.test(event.key)",
-        CustomerSearchCriteria.Id => "return event.key.length > 1 || /^[a-zA-Z]$/.test(event.key)",
-        _ => null
-    };
-
-    private string? GetSearchPaste() => _selectedCriteria switch
-    {
-        CustomerSearchCriteria.Identification => "const text = (event.clipboardData || window.clipboardData).getData('text'); if (!/^\\d*$/.test(text)) { event.preventDefault(); }",
-        CustomerSearchCriteria.Id => "const text = (event.clipboardData || window.clipboardData).getData('text'); if (!/^[a-zA-Z]*$/.test(text)) { event.preventDefault(); }",
-        _ => null
-    };
-
-    private void HandleSearchInput(ChangeEventArgs e)
-    {
-        var val = e.Value?.ToString() ?? string.Empty;
-        if (_selectedCriteria == CustomerSearchCriteria.Id)
+        else
         {
-            val = val.ToUpperInvariant();
+            <div class="table-responsive">
+                <table class="table table-hover table-striped align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>@ViewMessages.CustomerNameLabel</th>
+                            <th>@ViewMessages.CustomerIdentificationLabel</th>
+                            <th class="text-center" style="width: 120px;">@ViewMessages.ActionsLabel</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var customer in _customers)
+                        {
+                            <tr>
+                                <td class="fw-bold">@customer.Id</td>
+                                <td>
+                                    <div>@customer.Name</div>
+                                    @if (!string.IsNullOrWhiteSpace(customer.TradeName))
+                                    {
+                                        <div class="text-muted small"><i class="bi bi-shop me-1"></i>Comercial: @customer.TradeName</div>
+                                    }
+                                    @if (customer.CustomerType == CustomerType.Legal)
+                                    {
+                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle small">Jurídica</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle small">Natural</span>
+                                    }
+                                </td>
+                                <td>@customer.Identification</td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-success px-3"
+                                            type="button"
+                                            @onclick="() => SelectCustomerAsync(customer)">
+                                        @ViewMessages.SelectButton
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <DataPager CurrentPage="@_currentPage"
+                       TotalPages="@_totalPages"
+                       TotalCount="@_totalCount"
+                       ShowPageInfo="true"
+                       OnPageChanged="SearchAsync"
+                       Class="mt-3 pt-2 border-top" />
         }
-        _searchTerm = val;
-    }
-
-    private async Task HandleKeyDown(KeyboardEventArgs e)
-    {
-        if (e.Key == "Enter")
-        {
-            await SearchAsync(1);
-        }
-    }
-
-    public async Task SearchAsync(int pageNumber)
-    {
-        _isLoading = true;
-        _currentPage = pageNumber;
-
-        try
-        {
-            var result = await SearchGateway.SearchCustomersAsync(_searchTerm, _selectedCriteria, _currentPage, PageSize);
-            _customers = result.Items;
-            _totalCount = result.TotalCount;
-            _totalPages = (int)Math.Ceiling((double)_totalCount / PageSize);
-            if (_totalPages < 1) _totalPages = 1;
-        }
-        finally
-        {
-            _isLoading = false;
-        }
-    }
-
-    private async Task ClearSearchAsync()
-    {
-        _searchTerm = string.Empty;
-        await SearchAsync(1);
-    }
-
-    private async Task PreviousPageAsync()
-    {
-        if (HasPreviousPage)
-        {
-            await SearchAsync(_currentPage - 1);
-        }
-    }
-
-    private async Task NextPageAsync()
-    {
-        if (HasNextPage)
-        {
-            await SearchAsync(_currentPage + 1);
-        }
-    }
-
-    private async Task SelectCustomerAsync(CustomerDto customer)
-    {
-        await OnCustomerSelected.InvokeAsync(customer);
-        await CloseAsync();
-    }
-
-    private async Task CloseAsync()
-    {
-        _isDropdownOpen = false;
-        IsOpen = false;
-        await IsOpenChanged.InvokeAsync(false);
-    }
-}
+    </BodyTemplate>
+    <FooterTemplate>
+        <button type="button" class="btn btn-secondary" @onclick="CloseAsync">
+            @ViewMessages.CloseButton
+        </button>
+    </FooterTemplate>
+</ModalDialog>

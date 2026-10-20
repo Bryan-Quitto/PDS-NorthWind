@@ -6,6 +6,7 @@
     <ProjectReference Include="..\NorthWind.ValidationService.FluentValidation\NorthWind.ValidationService.FluentValidation.csproj" />
     <ProjectReference Include="..\..\EnterpriseBusinessRules\NorthWind.HttpDelegatingHandlers\NorthWind.HttpDelegatingHandlers.csproj" />
     <ProjectReference Include="..\..\InterfaceAdapters\NorthWind.Membership.Frontend.RazorViews\NorthWind.Membership.Frontend.RazorViews.csproj" />
+    <ProjectReference Include="..\..\InterfaceAdapters\NorthWind.RazorComponents\NorthWind.RazorComponents.csproj" />
   </ItemGroup>
 
   <ItemGroup>
